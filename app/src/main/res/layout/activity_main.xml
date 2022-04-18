@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+
+    <LinearLayout
+        android:layout_width="396dp"
+        android:layout_height="333dp"
+        android:orientation="vertical"
+        android:padding="20dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.495"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/question"
+        app:layout_constraintVertical_bias="0.193">
+
+        <Button
+            android:id="@+id/master"
+            android:layout_width="355dp"
+            android:layout_height="127dp"
+            android:height="50dp"
+            android:onClick="onClickMaster"
+            android:backgroundTint="#48A7F3"
+            android:text="Master"
+            android:textColorHighlight="#FFFFFF"
+            android:textColorLink="#5C5757"
+            android:textStyle="bold"
+            app:cornerRadius="30dp" />
+
+        <Button
+            android:id="@+id/worker"
+            android:layout_width="match_parent"
+            android:layout_height="125dp"
+            android:layout_marginTop="20dp"
+            android:backgroundTint="#48A7F3"
+            android:onClick="onClickSlave"
+            android:text="Worker"
+            android:textColorHighlight="#782525"
+            android:textColorLink="#000000"
+            android:textStyle="bold"
+            app:cornerRadius="30dp" />
+    </LinearLayout>
+
+</LinearLayout>
