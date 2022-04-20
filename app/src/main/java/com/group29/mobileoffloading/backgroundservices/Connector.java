@@ -19,11 +19,6 @@ public class Connector {
         }
     }
 
-    public static void sendToDevice(Context context, String endpointId, byte[] data) {
-        Payload payload = Payload.fromBytes(data);
-        Connector.sendToDevice(context, endpointId, payload);
-    }
-
     public static void sendToDevice(Context context, String endpointId, Payload payload) {
         Nearby.getConnectionsClient(context).sendPayload(endpointId, payload);
     }

@@ -33,12 +33,4 @@ public class WorkData implements Serializable {
         this.cols = cols;
     }
 
-    public int getAmountWork() {
-        return amountWork;
-    }
-
-    public void setAmountWork(int amountWork) {
-        this.amountWork = amountWork;
-    }
-
 }

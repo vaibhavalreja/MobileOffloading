@@ -6,7 +6,6 @@ import java.io.Serializable;
 
 public class DeviceInfo implements Serializable {
 
-    private int totalCapacity;
     private int batteryLevel;
     private boolean charging;
 
@@ -35,32 +34,12 @@ public class DeviceInfo implements Serializable {
         return latitude;
     }
 
-    public void setLatitude(double latitude) {
-        this.latitude = latitude;
-    }
-
     public double getLongitude() {
         return longitude;
     }
 
-    public void setLongitude(double longitude) {
-        this.longitude = longitude;
-    }
-
     public boolean isLocationValid() {
         return locationValid;
-    }
-
-    public void setLocationValid(boolean locationValid) {
-        this.locationValid = locationValid;
-    }
-
-    public int getTotalCapacity() {
-        return totalCapacity;
-    }
-
-    public void setTotalCapacity(int totalCapacity) {
-        this.totalCapacity = totalCapacity;
     }
 
     public void setLocation(Location loc) {

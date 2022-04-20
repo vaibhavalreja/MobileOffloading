@@ -53,6 +53,4 @@ public class LocationService {
             fusedLocationProviderClient.removeLocationUpdates(this.locationCallback);
         }
     }
-
-
 }
