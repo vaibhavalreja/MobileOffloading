@@ -138,9 +138,11 @@ public class Master_Discovery extends AppCompatActivity {
     public void assignTasks(View view) {
         ArrayList<ConnectedDevice> readyDevices = getDevicesInReadyState();
         if (readyDevices.size() == 0) {
+            Log.d("TEST","no devices");
             Toast.makeText(getApplicationContext(), "No worker Available at the moment", Toast.LENGTH_LONG).show();
             onBackPressed();
         } else {
+            Log.d("TEST","herer");
             masterDiscoveryService.stop();
             startMasterActivity(readyDevices);
             finish();
@@ -225,6 +227,7 @@ public class Master_Discovery extends AppCompatActivity {
                         setStatus("Still Searching...", true);
                     } else {
                         setStatus("Discovering Failed", false);
+                        Log.d("TEST", "discovery failed");
                         finish();
                     }
                     command.printStackTrace();
@@ -286,6 +289,7 @@ public class Master_Discovery extends AppCompatActivity {
         Bundle bundle = new Bundle();
         bundle.putSerializable(Constants.CONNECTED_DEVICES, connectedDevices);
         intent.putExtras(bundle);
+        Log.d("TEST","STARTM");
         startActivity(intent);
         finish();
     }

@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
+import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -57,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
                     requiredPermissions.add(permission);
                 }
             }
+            requiredPermissions.add(Manifest.permission.ACCESS_FINE_LOCATION);
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
