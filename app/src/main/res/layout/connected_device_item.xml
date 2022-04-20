@@ -39,7 +39,7 @@
                 android:layout_gravity="center"
                 android:layout_marginEnd="10dp"
                 android:layout_marginRight="10dp"
-                android:src="@drawable/battery_img" />
+                android:src="@drawable/battery_img_foreground" />
 
             <TextView
                 android:id="@+id/battery_level"

@@ -1,218 +1,102 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="10dp"
+    android:padding="15dp"
     tools:context=".WorkerActivity">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical|center_horizontal"
+        android:text="Role: Worker"
+        android:textSize="35sp"
+        android:textStyle="bold|italic" />
 
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="614dp"
-        android:orientation="vertical">
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
 
         <TextView
-            android:id="@+id/advertising"
+            android:id="@+id/advertText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:text="Worker Information"
-            android:textSize="30dp"
-            android:textStyle="bold" />
+            android:layout_marginStart="10dp"
+            android:text="State"
+            android:textSize="24sp"
+            android:textStyle="bold|italic" />
+
+        <TextView
+            android:id="@+id/statusText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/advertText"
+            android:layout_marginLeft="5dp"
+            android:text="null"
+            android:textSize="20sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/battery_img_foreground" />
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="504dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="130dp"
-                android:layout_marginTop="10dp"
-                android:elevation="4dp"
-                app:cardCornerRadius="15dp"
-                app:cardUseCompatPadding="true">
+            <TextView
+                android:id="@+id/percentage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Level: Measuring">
 
-                <RelativeLayout
-                    android:id="@+id/batteryCard"
-                    android:layout_width="match_parent"
-                    android:layout_height="157dp"
-                    android:background="#48A7F3"
-                    android:padding="10dp">
+            </TextView>
 
-                    <TextView
-                        android:id="@+id/batteryText"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="10dp"
-                        android:text="Battery Status"
-                        android:textColor="#000000"
-                        android:textSize="24sp"
-                        android:textStyle="bold">
-
-                    </TextView>
-
-                    <TextView
-                        android:id="@+id/percentage"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@id/batteryText"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginTop="3dp"
-                        android:text="Percentage: Calculating.."
-                        android:textColor="#000000">
-
-                    </TextView>
-
-                    <TextView
-                        android:id="@+id/plugged"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@id/percentage"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginTop="3dp"
-                        android:text="Charging Status: Checking.."
-                        android:textColor="#000000">
-
-                    </TextView>
-
-                    <!--eo.view.batterymeter.BatteryMeterView
-                        android:id="@+id/batteryMeter"
-                        android:layout_width="100dp"
-                        android:layout_height="120dp"
-                        android:layout_alignParentRight="true"
-                        android:padding="10dp"
-                        android:soundEffectsEnabled="true"
-
-                        app:batteryMeterChargeLevel="0"
-                        app:batteryMeterChargingColor="#FFFFFF"
-                        app:batteryMeterColor="#FFFFFF"
-                        app:batteryMeterCriticalChargeLevel="15"
-                        app:batteryMeterIsCharging="false"
-                        app:batteryMeterTheme="rounded"
-                        tools:layout_editor_absoluteX="131dp"
-                        tools:layout_editor_absoluteY="439dp" /> -->
-                </RelativeLayout>
-            </androidx.cardview.widget.CardView>
-
-            <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="130dp"
-                android:layout_marginTop="10dp"
-                android:elevation="4dp"
-                app:cardCornerRadius="15dp"
-                app:cardUseCompatPadding="true">
-
-                <RelativeLayout
-                    android:id="@+id/locationCard"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="#48A7F3"
-                    android:padding="10dp">
-
-                    <TextView
-                        android:id="@+id/locationText"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="10dp"
-                        android:text="Device Location"
-                        android:textColor="#000000"
-                        android:textSize="24sp"
-                        android:textStyle="bold">
-
-                    </TextView>
-
-                    <TextView
-                        android:id="@+id/latitude"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@id/locationText"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginTop="3dp"
-                        android:text="Lattitude: Calculating.."
-                        android:textColor="#000000">
-
-                    </TextView>
-
-                    <TextView
-                        android:id="@+id/longitude"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@id/latitude"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginTop="3dp"
-                        android:text="Longitude: Calculating.."
-                        android:textColor="#000000">
-
-                    </TextView>
-
-                    <!--ImageView
-                        android:id="@+id/imageView"
-                        android:layout_width="100dp"
-                        android:layout_height="120dp"
-                        android:layout_alignParentRight="true"
-                        app:srcCompat="@drawable/ic_location_on" /> -->
-                </RelativeLayout>
-            </androidx.cardview.widget.CardView>
-
-            <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="10dp"
-                app:cardBackgroundColor="#FFFFFF"
-                app:cardCornerRadius="15dp"
-                app:cardUseCompatPadding="true">
-
-                <RelativeLayout
-                    android:id="@+id/workerCard"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="#48A7F3"
-                    android:padding="10dp">
-
-                    <TextView
-                        android:id="@+id/advertText"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="10dp"
-                        android:text="Worker Status"
-                        android:textColor="#000000"
-                        android:textSize="24sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/statusText"
-
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@id/advertText"
-                        android:layout_marginLeft="10dp"
-                        android:text="Starting..."
-                        android:textColor="#000000"
-                        android:textSize="20sp" />
-
-                    <!--pl.droidsonroids.gif.GifImageView
-                        android:id="@+id/loading"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_below="@id/statusText"
-                        android:layout_marginStart="10dp"
-                        android:layout_marginTop="10dp"
-                        android:layout_marginEnd="10dp"
-                        android:layout_marginBottom="10dp"
-                        android:src="@drawable/loading" /-->
-
-                    <!--android:src="@drawable/ic_online"
-                        android:visibility="invisible"
-                        app:srcCompat="@drawable/ic_online"> -->
-                    <!--/ImageView> -->
-                </RelativeLayout>
-            </androidx.cardview.widget.CardView>
+            <TextView
+                android:id="@+id/plugged"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Plugged In: Checking" />
         </LinearLayout>
     </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/location_img_foreground" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/latitude"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Lattitude: Calculating" />
+
+            <TextView
+                android:id="@+id/longitude"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Longitude: Calculating" />
+        </LinearLayout>
+    </LinearLayout>
+
 </LinearLayout>
