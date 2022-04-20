@@ -7,10 +7,10 @@ import android.widget.Toast;
 
 import com.google.android.gms.nearby.connection.Payload;
 import com.group29.mobileoffloading.listeners.ComputationListener;
-import com.group29.mobileoffloading.models.ClientPayLoad;
-import com.group29.mobileoffloading.models.WorkData;
-import com.group29.mobileoffloading.models.WorkInfo;
-import com.group29.mobileoffloading.models.Worker;
+import com.group29.mobileoffloading.DataModels.ClientPayLoad;
+import com.group29.mobileoffloading.DataModels.WorkData;
+import com.group29.mobileoffloading.DataModels.WorkInfo;
+import com.group29.mobileoffloading.DataModels.Worker;
 import com.group29.mobileoffloading.utilities.Constants;
 import com.group29.mobileoffloading.utilities.FlushToFile;
 import com.group29.mobileoffloading.utilities.MatrixDS;

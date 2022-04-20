@@ -27,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         ((Button)findViewById(R.id.role_worker)).setOnClickListener(view -> {
-            Intent intent = new Intent(getApplicationContext(), Worker.class);
+            Intent intent = new Intent(getApplicationContext(), WorkerActivity.class);
             startActivity(intent);
         });
     }

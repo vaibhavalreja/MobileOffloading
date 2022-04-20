@@ -4,7 +4,7 @@ import android.content.Context;
 
 import com.google.android.gms.nearby.Nearby;
 import com.google.android.gms.nearby.connection.Payload;
-import com.group29.mobileoffloading.models.ClientPayLoad;
+import com.group29.mobileoffloading.DataModels.ClientPayLoad;
 import com.group29.mobileoffloading.utilities.PayloadConverter;
 
 import java.io.IOException;

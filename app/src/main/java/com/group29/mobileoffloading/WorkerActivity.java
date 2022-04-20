@@ -23,7 +23,7 @@ import com.group29.mobileoffloading.backgroundservices.NearbyConnectionsManager;
 import com.group29.mobileoffloading.listeners.ClientConnectionListener;
 import com.group29.mobileoffloading.utilities.Constants;
 
-public class Worker extends AppCompatActivity {
+public class WorkerActivity extends AppCompatActivity {
     private Advertiser advertiser;
     private String workerId;
     private String masterId = "";
@@ -36,7 +36,7 @@ public class Worker extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_worker_advertisement);
+        setContentView(R.layout.activity_worker);
         workerId = Build.MANUFACTURER + " " + Build.MODEL;
         initialiseDialog();
         //Start Advertisement

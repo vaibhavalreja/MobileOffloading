@@ -14,15 +14,15 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.SimpleItemAnimator;
 
 import com.group29.mobileoffloading.listeners.WorkerStatusListener;
-import com.group29.mobileoffloading.models.Worker;
+import com.group29.mobileoffloading.DataModels.Worker;
 import com.group29.mobileoffloading.CustomListAdapters.WorkersAdapter;
 import com.group29.mobileoffloading.backgroundservices.DeviceStatisticsPublisher;
 import com.group29.mobileoffloading.backgroundservices.NearbyConnectionsManager;
 import com.group29.mobileoffloading.backgroundservices.WorkAllocator;
 import com.group29.mobileoffloading.backgroundservices.WorkerStatusSubscriber;
-import com.group29.mobileoffloading.models.ConnectedDevice;
-import com.group29.mobileoffloading.models.DeviceStatistics;
-import com.group29.mobileoffloading.models.WorkInfo;
+import com.group29.mobileoffloading.DataModels.ConnectedDevice;
+import com.group29.mobileoffloading.DataModels.DeviceStatistics;
+import com.group29.mobileoffloading.DataModels.WorkInfo;
 import com.group29.mobileoffloading.utilities.Constants;
 import com.group29.mobileoffloading.utilities.FlushToFile;
 import com.group29.mobileoffloading.utilities.MatrixDS;
@@ -38,7 +38,7 @@ public class Master extends AppCompatActivity {
 
     private HashMap<String, WorkerStatusSubscriber> workerStatusSubscriberMap = new HashMap<>();
 
-    private ArrayList<com.group29.mobileoffloading.models.Worker> workers = new ArrayList<>();
+    private ArrayList<com.group29.mobileoffloading.DataModels.Worker> workers = new ArrayList<>();
     private WorkersAdapter workersAdapter;
 
 
@@ -104,7 +104,7 @@ public class Master extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        for (com.group29.mobileoffloading.models.Worker w : workers) {
+        for (com.group29.mobileoffloading.DataModels.Worker w : workers) {
             updateWorkerConnectionStatus(w.getEndpointId(), Constants.WorkStatus.DISCONNECTED);
             workAllocator.removeWorker(w.getEndpointId());
             NearbyConnectionsManager.getInstance(getApplicationContext()).disconnectFromEndpoint(w.getEndpointId());
@@ -161,7 +161,7 @@ public class Master extends AppCompatActivity {
 
     private void addToWorkers(ArrayList<ConnectedDevice> connectedDevices) {
         for (ConnectedDevice connectedDevice : connectedDevices) {
-            com.group29.mobileoffloading.models.Worker worker = new com.group29.mobileoffloading.models.Worker();
+            com.group29.mobileoffloading.DataModels.Worker worker = new com.group29.mobileoffloading.DataModels.Worker();
             worker.setEndpointId(connectedDevice.getEndpointId());
             worker.setEndpointName(connectedDevice.getEndpointName());
 
@@ -226,7 +226,7 @@ public class Master extends AppCompatActivity {
 
 
     private void startWorkerStatusSubscribers() {
-        for (com.group29.mobileoffloading.models.Worker worker : workers) {
+        for (com.group29.mobileoffloading.DataModels.Worker worker : workers) {
             if (workerStatusSubscriberMap.containsKey(worker.getEndpointId())) {
                 continue;
             }

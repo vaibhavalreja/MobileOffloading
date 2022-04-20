@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.BatteryManager;
 
-import com.group29.mobileoffloading.models.DeviceStatistics;
+import com.group29.mobileoffloading.DataModels.DeviceStatistics;
 
 public class Device {
 

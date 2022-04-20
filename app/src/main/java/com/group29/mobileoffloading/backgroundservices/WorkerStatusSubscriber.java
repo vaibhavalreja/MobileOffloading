@@ -6,9 +6,9 @@ import com.google.android.gms.nearby.connection.Payload;
 import com.google.android.gms.nearby.connection.PayloadTransferUpdate;
 import com.group29.mobileoffloading.listeners.PayloadListener;
 import com.group29.mobileoffloading.listeners.WorkerStatusListener;
-import com.group29.mobileoffloading.models.ClientPayLoad;
-import com.group29.mobileoffloading.models.DeviceStatistics;
-import com.group29.mobileoffloading.models.WorkInfo;
+import com.group29.mobileoffloading.DataModels.ClientPayLoad;
+import com.group29.mobileoffloading.DataModels.DeviceStatistics;
+import com.group29.mobileoffloading.DataModels.WorkInfo;
 import com.group29.mobileoffloading.utilities.Constants;
 import com.group29.mobileoffloading.utilities.PayloadConverter;
 

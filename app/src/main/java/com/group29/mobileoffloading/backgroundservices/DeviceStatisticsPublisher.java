@@ -9,8 +9,8 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
-import com.group29.mobileoffloading.models.ClientPayLoad;
-import com.group29.mobileoffloading.models.DeviceStatistics;
+import com.group29.mobileoffloading.DataModels.ClientPayLoad;
+import com.group29.mobileoffloading.DataModels.DeviceStatistics;
 import com.group29.mobileoffloading.utilities.Constants;
 import com.group29.mobileoffloading.utilities.DataTransfer;
 

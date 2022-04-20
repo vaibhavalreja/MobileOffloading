@@ -1,7 +1,7 @@
 package com.group29.mobileoffloading.listeners;
 
-import com.group29.mobileoffloading.models.DeviceStatistics;
-import com.group29.mobileoffloading.models.WorkInfo;
+import com.group29.mobileoffloading.DataModels.DeviceStatistics;
+import com.group29.mobileoffloading.DataModels.WorkInfo;
 
 public interface WorkerStatusListener {
 

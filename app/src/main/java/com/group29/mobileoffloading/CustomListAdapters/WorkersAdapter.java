@@ -10,7 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.group29.mobileoffloading.R;
-import com.group29.mobileoffloading.models.Worker;
+import com.group29.mobileoffloading.DataModels.Worker;
 import com.group29.mobileoffloading.utilities.Constants;
 
 import java.util.List;

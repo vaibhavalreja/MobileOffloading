@@ -28,13 +28,11 @@ import com.group29.mobileoffloading.backgroundservices.NearbyConnectionsManager;
 import com.group29.mobileoffloading.backgroundservices.WorkAllocator;
 import com.group29.mobileoffloading.listeners.ClientConnectionListener;
 import com.group29.mobileoffloading.listeners.PayloadListener;
-import com.group29.mobileoffloading.models.ClientPayLoad;
-import com.group29.mobileoffloading.models.ConnectedDevice;
-import com.group29.mobileoffloading.models.DeviceStatistics;
+import com.group29.mobileoffloading.DataModels.ClientPayLoad;
+import com.group29.mobileoffloading.DataModels.ConnectedDevice;
+import com.group29.mobileoffloading.DataModels.DeviceStatistics;
 import com.group29.mobileoffloading.utilities.Constants;
 import com.group29.mobileoffloading.utilities.PayloadConverter;
-
-import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.util.ArrayList;

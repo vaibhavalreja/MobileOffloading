@@ -1,4 +1,4 @@
-package com.group29.mobileoffloading.models;
+package com.group29.mobileoffloading.DataModels;
 
 import java.io.Serializable;
 

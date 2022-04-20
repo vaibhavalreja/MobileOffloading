@@ -18,9 +18,9 @@ import com.group29.mobileoffloading.backgroundservices.DeviceStatisticsPublisher
 import com.group29.mobileoffloading.backgroundservices.NearbyConnectionsManager;
 import com.group29.mobileoffloading.listeners.ClientConnectionListener;
 import com.group29.mobileoffloading.listeners.PayloadListener;
-import com.group29.mobileoffloading.models.ClientPayLoad;
-import com.group29.mobileoffloading.models.WorkData;
-import com.group29.mobileoffloading.models.WorkInfo;
+import com.group29.mobileoffloading.DataModels.ClientPayLoad;
+import com.group29.mobileoffloading.DataModels.WorkData;
+import com.group29.mobileoffloading.DataModels.WorkInfo;
 import com.group29.mobileoffloading.utilities.Constants;
 import com.group29.mobileoffloading.utilities.DataTransfer;
 import com.group29.mobileoffloading.utilities.MatrixDS;
@@ -47,7 +47,7 @@ public class Worker_Computation extends AppCompatActivity {
         startDeviceStatsPublisher();
         setConnectionCallback();
         connectToMaster();
-        //start measuring the pwer consumption at Worker
+        //start measuring the pwer consumption at WorkerActivity
         mBatteryManager = (BatteryManager)getSystemService(Context.BATTERY_SERVICE);
         initialEnergyWorker =
                 mBatteryManager.getLongProperty(BatteryManager.BATTERY_PROPERTY_ENERGY_COUNTER);

@@ -30,7 +30,7 @@
         </activity>
         <activity android:name=".Master" android:screenOrientation="portrait"/>
         <activity android:name=".Master_Discovery"/>
-        <activity android:name=".Worker"/>
+        <activity android:name=".WorkerActivity"/>
         <activity android:name=".Worker_Computation"/>
 
     </application>

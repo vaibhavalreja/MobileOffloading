@@ -11,7 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.group29.mobileoffloading.R;
-import com.group29.mobileoffloading.models.ConnectedDevice;
+import com.group29.mobileoffloading.DataModels.ConnectedDevice;
 import com.group29.mobileoffloading.utilities.Constants;
 
 import java.util.List;
