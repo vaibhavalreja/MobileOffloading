@@ -1,13 +1,14 @@
 package com.group29.mobileoffloading;
 
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.Settings;
 import android.util.Log;
 import android.widget.TextView;
 
@@ -30,31 +31,23 @@ public class WorkerActivity extends AppCompatActivity {
     private String masterId = "";
     private ClientConnectionListener connectionListener;
     private Dialog confirmationDialog;
-    private DeviceInfoBroadcaster deviceStatsPublisher;
+    private DeviceInfoBroadcaster deviceInfoBroadcaster;
     private Handler handler;
     private Runnable runnable;
     private AdvertisingOptions advertisingOptions;
 
+    @SuppressLint("HardwareIds")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_worker);
         this.advertisingOptions = new AdvertisingOptions.Builder().setStrategy(Strategy.P2P_CLUSTER).build();
-
-        workerId = Build.MANUFACTURER + " " + Build.MODEL;
-        initialiseDialog();
-        //Start Advertisement
-        deviceStatsPublisher = new DeviceInfoBroadcaster(getApplicationContext(), null, Constants.UPDATE_INTERVAL_UI);
+        workerId = Settings.Secure.getString(getApplicationContext().getContentResolver(), Settings.Secure.ANDROID_ID);
         setDeviceId("Device ID: " + workerId);
-        handler = new Handler(Looper.getMainLooper());
-        runnable = () -> {
-            refreshCardData();
-            handler.postDelayed(runnable, Constants.UPDATE_INTERVAL_UI);
-        };
-        setConnectionCallback();
-    }
 
-    void setConnectionCallback() {
+        //Start Advertisement
+        deviceInfoBroadcaster = new DeviceInfoBroadcaster(getApplicationContext(), null, Constants.UPDATE_INTERVAL_UI);
+
         connectionListener = new ClientConnectionListener() {
             @Override
             public void onConnectionInitiated(String id, ConnectionInfo connectionInfo) {
@@ -73,6 +66,12 @@ public class WorkerActivity extends AppCompatActivity {
                 Log.d("WORKER", "Connection Disconnected: " + id);
                 finish();
             }
+        };
+
+        handler = new Handler(Looper.getMainLooper());
+        runnable = () -> {
+            refreshCardData();
+            handler.postDelayed(runnable, Constants.UPDATE_INTERVAL_UI);
         };
     }
 
@@ -102,18 +101,14 @@ public class WorkerActivity extends AppCompatActivity {
         }
     }
 
-
-    void initialiseDialog() {
+    void showDialog(String masterInfo) {
         confirmationDialog = new BottomSheetDialog(this);
         confirmationDialog.setContentView(R.layout.confirmation_dialog);
         confirmationDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         confirmationDialog.findViewById(R.id.accept).setOnClickListener(v -> acceptConnection());
         confirmationDialog.findViewById(R.id.reject).setOnClickListener(v -> rejectConnection());
-    }
-
-    void showDialog(String masterInfo) {
         TextView title = confirmationDialog.findViewById(R.id.dialogText);
-        title.setText(String.format("%s is trying to connect. Do you accept the connection ?", masterInfo));
+        title.setText(String.format("Do you want to pair with %s?", masterInfo));
         confirmationDialog.show();
     }
 
@@ -145,7 +140,7 @@ public class WorkerActivity extends AppCompatActivity {
         });
         NearbyConnectionsManager.getInstance(getApplicationContext()).registerClientConnectionListener(connectionListener);
         Log.d("WORKER", "Starting Device Stats");
-        deviceStatsPublisher.start();
+        deviceInfoBroadcaster.start();
         handler.postDelayed(runnable, Constants.UPDATE_INTERVAL_UI);
     }
 
@@ -154,7 +149,7 @@ public class WorkerActivity extends AppCompatActivity {
         super.onPause();
         NearbyConnectionsManager.getInstance(getApplicationContext()).unregisterClientConnectionListener(connectionListener);
         Log.d("WORKER", "Stopping Device Stats");
-        deviceStatsPublisher.stop();
+        deviceInfoBroadcaster.stop();
         handler.removeCallbacks(runnable);
     }
 
