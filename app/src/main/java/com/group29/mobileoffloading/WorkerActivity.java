@@ -17,14 +17,14 @@ import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.nearby.connection.ConnectionInfo;
 import com.google.android.gms.nearby.connection.ConnectionResolution;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
-import com.group29.mobileoffloading.backgroundservices.Advertiser;
 import com.group29.mobileoffloading.backgroundservices.DeviceStatisticsPublisher;
 import com.group29.mobileoffloading.backgroundservices.NearbyConnectionsManager;
+import com.group29.mobileoffloading.backgroundservices.WorkerAdvertisingHelper;
 import com.group29.mobileoffloading.listeners.ClientConnectionListener;
 import com.group29.mobileoffloading.utilities.Constants;
 
 public class WorkerActivity extends AppCompatActivity {
-    private Advertiser advertiser;
+    private WorkerAdvertisingHelper workerAdvertisingHelper;
     private String workerId;
     private String masterId = "";
     private ClientConnectionListener connectionListener;
@@ -40,7 +40,7 @@ public class WorkerActivity extends AppCompatActivity {
         workerId = Build.MANUFACTURER + " " + Build.MODEL;
         initialiseDialog();
         //Start Advertisement
-        advertiser = new Advertiser(this.getApplicationContext());
+        workerAdvertisingHelper = new WorkerAdvertisingHelper(getApplicationContext());
         deviceStatsPublisher = new DeviceStatisticsPublisher(getApplicationContext(), null, Constants.UPDATE_INTERVAL_UI);
         setDeviceId("Device ID: " + workerId);
         handler = new Handler(Looper.getMainLooper());
@@ -62,7 +62,7 @@ public class WorkerActivity extends AppCompatActivity {
 
             @Override
             public void onConnectionResult(String id, ConnectionResolution connectionResolution) {
-                Log.d("WORKER", "Connection Accepted By: " + id + " " + connectionResolution.getStatus().toString());
+                Log.d("WORKER", "Connection Accepted By: " + id + " " + connectionResolution.getStatus());
             }
 
             @Override
@@ -73,9 +73,8 @@ public class WorkerActivity extends AppCompatActivity {
         };
     }
 
-    void setStatusText(String text, boolean available) {
-        TextView st = findViewById(R.id.statusText);
-        st.setText(text);
+    void setState(String text) {
+        ((TextView) findViewById(R.id.statusText)).setText(text);
     }
 
     void setDeviceId(String text) {
@@ -116,29 +115,29 @@ public class WorkerActivity extends AppCompatActivity {
     }
 
     void acceptConnection() {
-        NearbyConnectionsManager.getInstance(getApplicationContext()).acceptConnection(masterId);
+        workerAdvertisingHelper.acceptConnection(masterId);
         confirmationDialog.dismiss();
         startWorkerComputation();
     }
 
     void rejectConnection() {
-        NearbyConnectionsManager.getInstance(getApplicationContext()).rejectConnection(masterId);
+        workerAdvertisingHelper.rejectConnection(masterId);
         confirmationDialog.dismiss();
     }
 
     @Override
     protected void onResume() {
-        setStatusText("Initializing...", false);
+        setState("Initializing...");
         super.onResume();
-        advertiser.start(workerId).addOnSuccessListener(command -> {
+        workerAdvertisingHelper.advertise(workerId).addOnSuccessListener(command -> {
             Log.d("WORKER", "Discoverable by all devices");
-            setStatusText("Discoverable by all devices", true);
+            setState("Discoverable by all devices");
         }).addOnFailureListener(c -> {
             if (((ApiException) c).getStatusCode() == 8001) {
                 Log.d("WORKER", "Discoverable by all devices");
-                setStatusText("Discoverable by all devices", true);
+                setState("Discoverable by all devices");
             } else {
-                setStatusText("Failed to host device", false);
+                setState("Failed to host device");
             }
         });
         NearbyConnectionsManager.getInstance(getApplicationContext()).registerClientConnectionListener(connectionListener);
@@ -162,14 +161,14 @@ public class WorkerActivity extends AppCompatActivity {
         bundle.putString(Constants.MASTER_ENDPOINT_ID, masterId);
         intent.putExtras(bundle);
         startActivity(intent);
-        advertiser.stop();
+        workerAdvertisingHelper.stopAdvertising();
         Log.d("WORKER", "Device is not discoverable");
         finish();
     }
 
     @Override
     public void onBackPressed() {
-        advertiser.stop();
+        workerAdvertisingHelper.stopAdvertising();
         Log.d("WORKER", "Device is not discoverable");
         if (!masterId.equals("")) {
             NearbyConnectionsManager.getInstance(getApplicationContext()).disconnectFromEndpoint(masterId);
