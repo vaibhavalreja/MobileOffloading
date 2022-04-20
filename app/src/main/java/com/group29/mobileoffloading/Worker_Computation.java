@@ -14,7 +14,7 @@ import com.google.android.gms.nearby.connection.ConnectionInfo;
 import com.google.android.gms.nearby.connection.ConnectionResolution;
 import com.google.android.gms.nearby.connection.Payload;
 import com.google.android.gms.nearby.connection.PayloadTransferUpdate;
-import com.group29.mobileoffloading.backgroundservices.DeviceStatisticsPublisher;
+import com.group29.mobileoffloading.backgroundservices.DeviceInfoBroadcaster;
 import com.group29.mobileoffloading.backgroundservices.NearbyConnectionsManager;
 import com.group29.mobileoffloading.listeners.ClientConnectionListener;
 import com.group29.mobileoffloading.listeners.PayloadListener;
@@ -31,7 +31,7 @@ import java.util.HashSet;
 
 public class Worker_Computation extends AppCompatActivity {
     private String masterId;
-    private DeviceStatisticsPublisher deviceStatsPublisher;
+    private DeviceInfoBroadcaster deviceStatsPublisher;
     private ClientConnectionListener connectionListener;
     private PayloadListener payloadCallback;
     private int currentPartitionIndex;
@@ -81,7 +81,7 @@ public class Worker_Computation extends AppCompatActivity {
     }
 
     private void startDeviceStatsPublisher() {
-        deviceStatsPublisher = new DeviceStatisticsPublisher(getApplicationContext(), masterId, Constants.UPDATE_INTERVAL_UI);
+        deviceStatsPublisher = new DeviceInfoBroadcaster(getApplicationContext(), masterId, Constants.UPDATE_INTERVAL_UI);
     }
 
     private void connectToMaster() {

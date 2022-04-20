@@ -30,7 +30,7 @@ import com.group29.mobileoffloading.listeners.ClientConnectionListener;
 import com.group29.mobileoffloading.listeners.PayloadListener;
 import com.group29.mobileoffloading.DataModels.ClientPayLoad;
 import com.group29.mobileoffloading.DataModels.ConnectedDevice;
-import com.group29.mobileoffloading.DataModels.DeviceStatistics;
+import com.group29.mobileoffloading.DataModels.DeviceInfo;
 import com.group29.mobileoffloading.utilities.Constants;
 import com.group29.mobileoffloading.utilities.PayloadConverter;
 
@@ -84,7 +84,7 @@ public class Master_Discovery extends AppCompatActivity {
                 try {
                     ClientPayLoad tPayload = PayloadConverter.fromPayload(payload);
                     if (tPayload.getTag().equals(Constants.PayloadTags.DEVICE_STATS)) {
-                        updateDeviceStats(endpointId, (DeviceStatistics) tPayload.getData());
+                        updateDeviceStats(endpointId, (DeviceInfo) tPayload.getData());
                     }
                 } catch (IOException | ClassNotFoundException e) {
                     e.printStackTrace();
@@ -197,7 +197,7 @@ public class Master_Discovery extends AppCompatActivity {
                 connectedDevice.setEndpointId(endpointId);
                 connectedDevice.setEndpointName(discoveredEndpointInfo.getEndpointName());
                 connectedDevice.setRequestStatus(Constants.RequestStatus.PENDING);
-                connectedDevice.setDeviceStats(new DeviceStatistics());
+                connectedDevice.setDeviceStats(new DeviceInfo());
 
                 connectedDevices.add(connectedDevice);
                 connectedDevicesAdapter.notifyItemChanged(connectedDevices.size() - 1);
@@ -248,7 +248,7 @@ public class Master_Discovery extends AppCompatActivity {
         }
     }
 
-    private void updateDeviceStats(String endpointId, DeviceStatistics deviceStats) {
+    private void updateDeviceStats(String endpointId, DeviceInfo deviceStats) {
         canAssign(deviceStats);
         for (int i = 0; i < connectedDevices.size(); i++) {
             if (connectedDevices.get(i).getEndpointId().equals(endpointId)) {
@@ -261,7 +261,7 @@ public class Master_Discovery extends AppCompatActivity {
         }
     }
 
-    void canAssign(DeviceStatistics deviceStats) {
+    void canAssign(DeviceInfo deviceStats) {
         Button assignButton = findViewById(R.id.assignTask);
         assignButton.setVisibility(deviceStats.getBatteryLevel() > WorkAllocator.ThresholdsHolder.MINIMUM_BATTERY_LEVEL ? View.VISIBLE : View.INVISIBLE);
     }

@@ -10,11 +10,11 @@ import android.os.Looper;
 import android.util.Log;
 
 import com.group29.mobileoffloading.DataModels.ClientPayLoad;
-import com.group29.mobileoffloading.DataModels.DeviceStatistics;
+import com.group29.mobileoffloading.DataModels.DeviceInfo;
 import com.group29.mobileoffloading.utilities.Constants;
 import com.group29.mobileoffloading.utilities.DataTransfer;
 
-public class DeviceStatisticsPublisher {
+public class DeviceInfoBroadcaster {
 
     private Context context;
     private String endpointId;
@@ -22,7 +22,7 @@ public class DeviceStatisticsPublisher {
     private Runnable runnable;
     private int interval;
 
-    public DeviceStatisticsPublisher(Context context, String endpointId, int updateInterval) {
+    public DeviceInfoBroadcaster(Context context, String endpointId, int updateInterval) {
         this.context = context;
         this.endpointId = endpointId;
         this.interval = updateInterval;
@@ -44,12 +44,12 @@ public class DeviceStatisticsPublisher {
     }
 
     private void publish() {
-        DeviceStatisticsPublisher.publish(this.context, this.endpointId);
+        DeviceInfoBroadcaster.publish(this.context, this.endpointId);
     }
 
     public static void publish(Context context, String endpointId) {
         // Get Device Statistics
-        DeviceStatistics deviceStats = new DeviceStatistics();
+        DeviceInfo deviceStats = new DeviceInfo();
         deviceStats.setBatteryLevel(getBatteryLevel(context));
         deviceStats.setCharging(isPluggedIn(context));
         deviceStats.setLocation(getLocation(context));

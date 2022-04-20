@@ -5,7 +5,7 @@ import java.io.Serializable;
 public class ConnectedDevice implements Serializable {
     private String endpointId;
     private String endpointName;
-    private DeviceStatistics deviceStats;
+    private DeviceInfo deviceInfo;
     private String requestStatus;
 
 
@@ -25,12 +25,12 @@ public class ConnectedDevice implements Serializable {
         this.endpointName = endpointName;
     }
 
-    public DeviceStatistics getDeviceStats() {
-        return deviceStats;
+    public DeviceInfo getDeviceStats() {
+        return deviceInfo;
     }
 
-    public void setDeviceStats(DeviceStatistics deviceStats) {
-        this.deviceStats = deviceStats;
+    public void setDeviceStats(DeviceInfo deviceInfo) {
+        this.deviceInfo = deviceInfo;
     }
 
     public String getRequestStatus() {

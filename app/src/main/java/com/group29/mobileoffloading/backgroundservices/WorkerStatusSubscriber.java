@@ -7,7 +7,7 @@ import com.google.android.gms.nearby.connection.PayloadTransferUpdate;
 import com.group29.mobileoffloading.listeners.PayloadListener;
 import com.group29.mobileoffloading.listeners.WorkerStatusListener;
 import com.group29.mobileoffloading.DataModels.ClientPayLoad;
-import com.group29.mobileoffloading.DataModels.DeviceStatistics;
+import com.group29.mobileoffloading.DataModels.DeviceInfo;
 import com.group29.mobileoffloading.DataModels.WorkInfo;
 import com.group29.mobileoffloading.utilities.Constants;
 import com.group29.mobileoffloading.utilities.PayloadConverter;
@@ -41,7 +41,7 @@ public class WorkerStatusSubscriber {
                         }
                     } else if (payloadTag.equals(Constants.PayloadTags.DEVICE_STATS)) {
                         if (workerStatusListener != null) {
-                            workerStatusListener.onDeviceStatsReceived(endpointId, (DeviceStatistics) tPayload.getData());
+                            workerStatusListener.onDeviceStatsReceived(endpointId, (DeviceInfo) tPayload.getData());
                         }
                     }
                 } catch (IOException | ClassNotFoundException e) {

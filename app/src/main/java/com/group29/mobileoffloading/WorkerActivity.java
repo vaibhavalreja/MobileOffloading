@@ -20,7 +20,7 @@ import com.google.android.gms.nearby.connection.ConnectionInfo;
 import com.google.android.gms.nearby.connection.ConnectionResolution;
 import com.google.android.gms.nearby.connection.Strategy;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
-import com.group29.mobileoffloading.backgroundservices.DeviceStatisticsPublisher;
+import com.group29.mobileoffloading.backgroundservices.DeviceInfoBroadcaster;
 import com.group29.mobileoffloading.backgroundservices.NearbyConnectionsManager;
 import com.group29.mobileoffloading.listeners.ClientConnectionListener;
 import com.group29.mobileoffloading.utilities.Constants;
@@ -30,7 +30,7 @@ public class WorkerActivity extends AppCompatActivity {
     private String masterId = "";
     private ClientConnectionListener connectionListener;
     private Dialog confirmationDialog;
-    private DeviceStatisticsPublisher deviceStatsPublisher;
+    private DeviceInfoBroadcaster deviceStatsPublisher;
     private Handler handler;
     private Runnable runnable;
     private AdvertisingOptions advertisingOptions;
@@ -44,7 +44,7 @@ public class WorkerActivity extends AppCompatActivity {
         workerId = Build.MANUFACTURER + " " + Build.MODEL;
         initialiseDialog();
         //Start Advertisement
-        deviceStatsPublisher = new DeviceStatisticsPublisher(getApplicationContext(), null, Constants.UPDATE_INTERVAL_UI);
+        deviceStatsPublisher = new DeviceInfoBroadcaster(getApplicationContext(), null, Constants.UPDATE_INTERVAL_UI);
         setDeviceId("Device ID: " + workerId);
         handler = new Handler(Looper.getMainLooper());
         runnable = () -> {
@@ -86,14 +86,14 @@ public class WorkerActivity extends AppCompatActivity {
 
     void refreshCardData() {
         TextView st = findViewById(R.id.percentage);
-        st.setText("Percentage: " + DeviceStatisticsPublisher.getBatteryLevel(this) + "%");
+        st.setText("Percentage: " + DeviceInfoBroadcaster.getBatteryLevel(this) + "%");
         TextView st2 = findViewById(R.id.plugged);
-        st2.setText(String.format("Charging Status: %s", DeviceStatisticsPublisher.isPluggedIn(this) ? "Plugged In" : "Not Charging"));
-        if (DeviceStatisticsPublisher.getLocation(this) != null) {
+        st2.setText(String.format("Charging Status: %s", DeviceInfoBroadcaster.isPluggedIn(this) ? "Plugged In" : "Not Charging"));
+        if (DeviceInfoBroadcaster.getLocation(this) != null) {
             TextView la = findViewById(R.id.latitude);
-            la.setText(String.format("Latitude: %s", DeviceStatisticsPublisher.getLocation(this).getLatitude()));
+            la.setText(String.format("Latitude: %s", DeviceInfoBroadcaster.getLocation(this).getLatitude()));
             TextView lo = findViewById(R.id.longitude);
-            lo.setText("Longitude: " + DeviceStatisticsPublisher.getLocation(this).getLongitude());
+            lo.setText("Longitude: " + DeviceInfoBroadcaster.getLocation(this).getLongitude());
         } else {
             TextView la = findViewById(R.id.latitude);
             la.setText("Latitude: Not Available");

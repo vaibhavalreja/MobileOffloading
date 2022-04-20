@@ -5,7 +5,7 @@ import java.io.Serializable;
 public class Worker implements Serializable {
 
     private String endpointId, endpointName;
-    private DeviceStatistics deviceStatistics;
+    private DeviceInfo deviceInfo;
     private WorkInfo workInfo;
 
     private int workQuantity;
@@ -35,12 +35,12 @@ public class Worker implements Serializable {
         this.workInfo = workStatus;
     }
 
-    public DeviceStatistics getDeviceStats() {
-        return deviceStatistics;
+    public DeviceInfo getDeviceStats() {
+        return deviceInfo;
     }
 
-    public void setDeviceStats(DeviceStatistics deviceStats) {
-        this.deviceStatistics = deviceStats;
+    public void setDeviceStats(DeviceInfo deviceStats) {
+        this.deviceInfo = deviceStats;
     }
 
     public int getWorkAmount() {

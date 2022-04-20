@@ -16,12 +16,12 @@ import androidx.recyclerview.widget.SimpleItemAnimator;
 import com.group29.mobileoffloading.listeners.WorkerStatusListener;
 import com.group29.mobileoffloading.DataModels.Worker;
 import com.group29.mobileoffloading.CustomListAdapters.WorkersAdapter;
-import com.group29.mobileoffloading.backgroundservices.DeviceStatisticsPublisher;
+import com.group29.mobileoffloading.backgroundservices.DeviceInfoBroadcaster;
 import com.group29.mobileoffloading.backgroundservices.NearbyConnectionsManager;
 import com.group29.mobileoffloading.backgroundservices.WorkAllocator;
 import com.group29.mobileoffloading.backgroundservices.WorkerStatusSubscriber;
 import com.group29.mobileoffloading.DataModels.ConnectedDevice;
-import com.group29.mobileoffloading.DataModels.DeviceStatistics;
+import com.group29.mobileoffloading.DataModels.DeviceInfo;
 import com.group29.mobileoffloading.DataModels.WorkInfo;
 import com.group29.mobileoffloading.utilities.Constants;
 import com.group29.mobileoffloading.utilities.FlushToFile;
@@ -57,7 +57,7 @@ public class Master extends AppCompatActivity {
     private int totalPartitions;
     private Handler handler;
     private Runnable runnable;
-    private DeviceStatisticsPublisher deviceStatsPublisher;
+    private DeviceInfoBroadcaster deviceStatsPublisher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -169,7 +169,7 @@ public class Master extends AppCompatActivity {
             workStatus.setStatusInfo(Constants.WorkStatus.WORKING);
 
             worker.setWorkStatus(workStatus);
-            worker.setDeviceStats(new DeviceStatistics());
+            worker.setDeviceStats(new DeviceInfo());
 
             workers.add(worker);
         }
@@ -200,11 +200,11 @@ public class Master extends AppCompatActivity {
 
 
     private void setupDeviceBatteryStatsCollector() {
-        deviceStatsPublisher = new DeviceStatisticsPublisher(getApplicationContext(), null, Constants.UPDATE_INTERVAL_UI);
+        deviceStatsPublisher = new DeviceInfoBroadcaster(getApplicationContext(), null, Constants.UPDATE_INTERVAL_UI);
         handler = new Handler();
         runnable = () -> {
-            String deviceStatsStr = DeviceStatisticsPublisher.getBatteryLevel(this) + "%"
-                    + "\t" + (DeviceStatisticsPublisher.isPluggedIn(this) ? "CHARGING" : "NOT CHARGING");
+            String deviceStatsStr = DeviceInfoBroadcaster.getBatteryLevel(this) + "%"
+                    + "\t" + (DeviceInfoBroadcaster.isPluggedIn(this) ? "CHARGING" : "NOT CHARGING");
             FlushToFile.writeTextToFile(getApplicationContext(), "master_battery.txt", true, deviceStatsStr);
             handler.postDelayed(runnable, Constants.UPDATE_INTERVAL_UI);
         };
@@ -246,7 +246,7 @@ public class Master extends AppCompatActivity {
                 }
 
                 @Override
-                public void onDeviceStatsReceived(String endpointId, DeviceStatistics deviceStats) {
+                public void onDeviceStatsReceived(String endpointId, DeviceInfo deviceStats) {
                     updateWorkerStatus(endpointId, deviceStats);
 
                     String deviceStatsStr = deviceStats.getBatteryLevel() + "%"
@@ -295,13 +295,13 @@ public class Master extends AppCompatActivity {
 
     }
 
-    private void updateWorkerStatus(String endpointId, DeviceStatistics deviceStats) {
+    private void updateWorkerStatus(String endpointId, DeviceInfo deviceStats) {
         for (int i = 0; i < workers.size(); i++) {
             Worker worker = workers.get(i);
 
             if (worker.getEndpointId().equals(endpointId)) {
                 worker.setDeviceStats(deviceStats);
-                Location masterLocation = DeviceStatisticsPublisher.getLocation(this);
+                Location masterLocation = DeviceInfoBroadcaster.getLocation(this);
                 if (deviceStats.isLocationValid() && masterLocation != null) {
                     float[] results = new float[1];
                     Location.distanceBetween(masterLocation.getLatitude(), masterLocation.getLongitude(),
