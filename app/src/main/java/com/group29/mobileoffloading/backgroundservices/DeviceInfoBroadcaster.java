@@ -49,15 +49,15 @@ public class DeviceInfoBroadcaster {
 
     public static void publish(Context context, String endpointId) {
         // Get Device Statistics
-        DeviceInfo deviceStats = new DeviceInfo();
-        deviceStats.setBatteryLevel(getBatteryLevel(context));
-        deviceStats.setCharging(isPluggedIn(context));
-        deviceStats.setLocation(getLocation(context));
+        DeviceInfo deviceInfo = new DeviceInfo();
+        deviceInfo.setBatteryLevel(getBatteryLevel(context));
+        deviceInfo.setCharging(isPluggedIn(context));
+        deviceInfo.setLocation(getLocation(context));
         if(endpointId != null) {
-            ClientPayLoad payload = new ClientPayLoad().setTag(Constants.PayloadTags.DEVICE_STATS).setData(deviceStats);
+            ClientPayLoad payload = new ClientPayLoad().setTag(Constants.PayloadTags.DEVICE_STATS).setData(deviceInfo);
             DataTransfer.sendPayload(context, endpointId, payload);
         }
-        Log.d("DEVICE_STATS", "DEVICE STATUS B: " + deviceStats.getBatteryLevel() + " P: " + deviceStats.isCharging() +  " L: " + deviceStats.getLatitude() + " " + deviceStats.getLongitude());
+        Log.d("DEVICE_STATS", "DEVICE STATUS B: " + deviceInfo.getBatteryLevel() + " P: " + deviceInfo.isCharging() +  " L: " + deviceInfo.getLatitude() + " " + deviceInfo.getLongitude());
     }
 
     public static Location getLocation(Context context) {
