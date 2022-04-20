@@ -10,6 +10,7 @@
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_master.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_master_discovery.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/activity_worker.xml" value="0.25" />
         <entry key="app/src/main/res/layout/activity_worker_advertisement.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_worker_computation.xml" value="0.1" />
         <entry key="app/src/main/res/layout/confirmation_dialog.xml" value="0.1" />
