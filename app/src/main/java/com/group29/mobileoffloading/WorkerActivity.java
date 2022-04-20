@@ -14,17 +14,18 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.nearby.Nearby;
+import com.google.android.gms.nearby.connection.AdvertisingOptions;
 import com.google.android.gms.nearby.connection.ConnectionInfo;
 import com.google.android.gms.nearby.connection.ConnectionResolution;
+import com.google.android.gms.nearby.connection.Strategy;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.group29.mobileoffloading.backgroundservices.DeviceStatisticsPublisher;
 import com.group29.mobileoffloading.backgroundservices.NearbyConnectionsManager;
-import com.group29.mobileoffloading.backgroundservices.WorkerAdvertisingHelper;
 import com.group29.mobileoffloading.listeners.ClientConnectionListener;
 import com.group29.mobileoffloading.utilities.Constants;
 
 public class WorkerActivity extends AppCompatActivity {
-    private WorkerAdvertisingHelper workerAdvertisingHelper;
     private String workerId;
     private String masterId = "";
     private ClientConnectionListener connectionListener;
@@ -32,15 +33,17 @@ public class WorkerActivity extends AppCompatActivity {
     private DeviceStatisticsPublisher deviceStatsPublisher;
     private Handler handler;
     private Runnable runnable;
+    private AdvertisingOptions advertisingOptions;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_worker);
+        this.advertisingOptions = new AdvertisingOptions.Builder().setStrategy(Strategy.P2P_CLUSTER).build();
+
         workerId = Build.MANUFACTURER + " " + Build.MODEL;
         initialiseDialog();
         //Start Advertisement
-        workerAdvertisingHelper = new WorkerAdvertisingHelper(getApplicationContext());
         deviceStatsPublisher = new DeviceStatisticsPublisher(getApplicationContext(), null, Constants.UPDATE_INTERVAL_UI);
         setDeviceId("Device ID: " + workerId);
         handler = new Handler(Looper.getMainLooper());
@@ -115,13 +118,13 @@ public class WorkerActivity extends AppCompatActivity {
     }
 
     void acceptConnection() {
-        workerAdvertisingHelper.acceptConnection(masterId);
+        NearbyConnectionsManager.getInstance(getApplicationContext()).acceptConnection(masterId);
         confirmationDialog.dismiss();
         startWorkerComputation();
     }
 
     void rejectConnection() {
-        workerAdvertisingHelper.rejectConnection(masterId);
+        NearbyConnectionsManager.getInstance(getApplicationContext()).rejectConnection(masterId);
         confirmationDialog.dismiss();
     }
 
@@ -129,7 +132,7 @@ public class WorkerActivity extends AppCompatActivity {
     protected void onResume() {
         setState("Initializing...");
         super.onResume();
-        workerAdvertisingHelper.advertise(workerId).addOnSuccessListener(command -> {
+        NearbyConnectionsManager.getInstance(getApplicationContext()).advertise(workerId, advertisingOptions).addOnSuccessListener(command -> {
             Log.d("WORKER", "Discoverable by all devices");
             setState("Discoverable by all devices");
         }).addOnFailureListener(c -> {
@@ -161,14 +164,14 @@ public class WorkerActivity extends AppCompatActivity {
         bundle.putString(Constants.MASTER_ENDPOINT_ID, masterId);
         intent.putExtras(bundle);
         startActivity(intent);
-        workerAdvertisingHelper.stopAdvertising();
+        Nearby.getConnectionsClient(getApplicationContext()).stopAdvertising();
         Log.d("WORKER", "Device is not discoverable");
         finish();
     }
 
     @Override
     public void onBackPressed() {
-        workerAdvertisingHelper.stopAdvertising();
+        Nearby.getConnectionsClient(getApplicationContext()).stopAdvertising();
         Log.d("WORKER", "Device is not discoverable");
         if (!masterId.equals("")) {
             NearbyConnectionsManager.getInstance(getApplicationContext()).disconnectFromEndpoint(masterId);
