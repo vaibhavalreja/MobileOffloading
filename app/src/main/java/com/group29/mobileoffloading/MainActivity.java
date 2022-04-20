@@ -1,84 +1,80 @@
 package com.group29.mobileoffloading;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
 import android.content.Intent;
-import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
-import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
-    private final int PERMISSIONS_REQUEST_CODE = 111;
+    private final int REQUEST_CODE_FOR_PERMISSION = 12345;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-    }
+        ((Button)findViewById(R.id.role_master)).setOnClickListener(view -> {
+            Intent intent = new Intent(getApplicationContext(), Master_Discovery.class);
+            startActivity(intent);
+        });
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        String[] requiredPermissions =  checkPermissions();
-        if (requiredPermissions.length > 0) {
-            askPermissions(requiredPermissions);
-        }
+        ((Button)findViewById(R.id.role_worker)).setOnClickListener(view -> {
+            Intent intent = new Intent(getApplicationContext(), Worker.class);
+            startActivity(intent);
+        });
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-        if (requestCode == PERMISSIONS_REQUEST_CODE) {
-            for (int grantResult : grantResults) {
-                if (grantResult == PackageManager.PERMISSION_DENIED) {
-                    Toast.makeText(getApplicationContext(), "Please provide all necessary permissions", Toast.LENGTH_LONG).show();
-                    onBackPressed();
+        if (requestCode == REQUEST_CODE_FOR_PERMISSION) {
+            for (int isGranted : grantResults) {
+                if (isGranted == PackageManager.PERMISSION_DENIED) {
+                    Toast.makeText(getApplicationContext(), "Some Permissions are missing.\nPlease go to settings and allow all the requested permissions", Toast.LENGTH_LONG).show();
                     finish();
                 }
             }
         }
     }
 
-    private String[] checkPermissions() {
-        ArrayList<String> requiredPermissions = new ArrayList<>();
-        try {
-            String packageName = getPackageName();
-            PackageInfo packageInfo = getPackageManager().getPackageInfo(packageName, PackageManager.GET_PERMISSIONS);
-            String[] permissions = packageInfo.requestedPermissions;
+    @RequiresApi(api = Build.VERSION_CODES.Q)
+    private void checkAndAskPermissions() {
+        ArrayList<String> permissionsToRequest = new ArrayList<String>();
+        String[] permissions = {Manifest.permission.READ_EXTERNAL_STORAGE,
+                                Manifest.permission.ACCESS_FINE_LOCATION,
+                                Manifest.permission.INTERNET,
+                                Manifest.permission.BLUETOOTH_ADMIN,
+                                Manifest.permission.ACCESS_WIFI_STATE,
+                                Manifest.permission.BLUETOOTH,
+                                Manifest.permission.CHANGE_WIFI_STATE,
+                                Manifest.permission.ACCESS_COARSE_LOCATION,
+                                Manifest.permission.ACCESS_BACKGROUND_LOCATION};
 
-            for (String permission : permissions) {
-                if (ActivityCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
-                    requiredPermissions.add(permission);
-                }
+        for (String permission : permissions) {
+            if (ActivityCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
+                permissionsToRequest.add(permission);
             }
-            requiredPermissions.add(Manifest.permission.ACCESS_FINE_LOCATION);
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
         }
-
-        String[] _requiredPermissions = new String[requiredPermissions.size()];
-        _requiredPermissions = requiredPermissions.toArray(_requiredPermissions);
-        return _requiredPermissions;
+        if(permissionsToRequest.size() > 0){
+            String[] requestPermissions = new String[permissionsToRequest.size()];
+            requestPermissions = permissionsToRequest.toArray(requestPermissions);
+            ActivityCompat.requestPermissions(this, requestPermissions, REQUEST_CODE_FOR_PERMISSION);
+        }
     }
 
-    private void askPermissions(String[] requiredPermissions) {
-        ActivityCompat.requestPermissions(this, requiredPermissions, PERMISSIONS_REQUEST_CODE);
-    }
-
-    public void onClickMaster(View view) {
-        Intent intent = new Intent(getApplicationContext(), Master_Discovery.class);
-        startActivity(intent);
-    }
-
-    public void onClickSlave(View view) {
-        Intent intent = new Intent(getApplicationContext(), Worker.class);
-        startActivity(intent);
+    @RequiresApi(api = Build.VERSION_CODES.Q)
+    @Override
+    protected void onResume() {
+        super.onResume();
+        checkAndAskPermissions();
     }
 }

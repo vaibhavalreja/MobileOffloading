@@ -115,7 +115,6 @@ public class Master extends AppCompatActivity {
 
     private void init() {
         totalPartitions = rows1 * cols2;
-        //updateProgress(0);
         matrix1 = MatrixDS.createMatrix(rows1, cols1);
         matrix2 = MatrixDS.createMatrix(rows2, cols2);
         TextView totalPart = findViewById(R.id.totalPartitions);

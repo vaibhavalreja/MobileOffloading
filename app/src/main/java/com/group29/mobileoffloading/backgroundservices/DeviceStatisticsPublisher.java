@@ -72,11 +72,13 @@ public class DeviceStatisticsPublisher {
 
     public static boolean isPluggedIn(Context context) {
         Intent intent = context.registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
-        int plugStatus = intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1);
-        return plugStatus == BatteryManager.BATTERY_STATUS_CHARGING
-                || plugStatus == BatteryManager.BATTERY_PLUGGED_AC
-                || plugStatus == BatteryManager.BATTERY_PLUGGED_USB
-                || plugStatus == BatteryManager.BATTERY_PLUGGED_WIRELESS;
+        int isCharging = intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1);
+        final boolean b;
+        if (isCharging == BatteryManager.BATTERY_PLUGGED_AC
+                || isCharging == BatteryManager.BATTERY_PLUGGED_USB
+                || isCharging == BatteryManager.BATTERY_PLUGGED_WIRELESS) b = true;
+        else b = false;
+        return b;
     }
 
 }

@@ -34,6 +34,8 @@ import com.group29.mobileoffloading.models.DeviceStatistics;
 import com.group29.mobileoffloading.utilities.Constants;
 import com.group29.mobileoffloading.utilities.PayloadConverter;
 
+import org.w3c.dom.Text;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -50,7 +52,7 @@ public class Master_Discovery extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        setStatus("Stopped", false);
+        setState("Stopped");
         masterDiscoveryService.stop();
         NearbyConnectionsManager.getInstance(getApplicationContext()).unregisterPayloadListener(payloadListener);
         NearbyConnectionsManager.getInstance(getApplicationContext()).unregisterClientConnectionListener(clientConnectionListener);
@@ -220,13 +222,13 @@ public class Master_Discovery extends AppCompatActivity {
         masterDiscoveryService = new MasterDiscoveryService(this);
         masterDiscoveryService.start(endpointDiscoveryCallback)
                 .addOnSuccessListener((unused) -> {
-                    setStatus("Searching...", true);
+                    setState("Searching");
                 })
                 .addOnFailureListener(command -> {
                     if (((ApiException) command).getStatusCode() == 8002) {
-                        setStatus("Still Searching...", true);
+                        setState("Searching");
                     } else {
-                        setStatus("Discovering Failed", false);
+                        setState("Search Failed");
                         Log.d("TEST", "discovery failed");
                         finish();
                     }
@@ -254,7 +256,6 @@ public class Master_Discovery extends AppCompatActivity {
             if (connectedDevices.get(i).getEndpointId().equals(endpointId)) {
                 connectedDevices.get(i).setDeviceStats(deviceStats);
 
-//                Toast.makeText(getApplicationContext(), "Success: updated battery level: can proceed", Toast.LENGTH_SHORT).show();
                 connectedDevices.get(i).setRequestStatus(Constants.RequestStatus.ACCEPTED);
                 connectedDevicesAdapter.notifyItemChanged(i);
                 break;
@@ -267,9 +268,8 @@ public class Master_Discovery extends AppCompatActivity {
         assignButton.setVisibility(deviceStats.getBatteryLevel() > WorkAllocator.ThresholdsHolder.MINIMUM_BATTERY_LEVEL ? View.VISIBLE : View.INVISIBLE);
     }
 
-    void setStatus(String text, boolean search) {
-        TextView disc = findViewById(R.id.discovery);
-        disc.setText(text);
+    void setState(String text) {
+        ((TextView) findViewById(R.id.discovery)).setText(text);
     }
 
     @Override
