@@ -69,6 +69,7 @@
         android:id="@+id/assignTask"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical|center_horizontal"
         android:onClick="assignTasks"
         android:text="Distribute Work"
         android:visibility="invisible" />
