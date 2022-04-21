@@ -39,7 +39,7 @@ public class ConnectedDevicesAdapter extends RecyclerView.Adapter<ConnectedDevic
     public void onBindViewHolder(@NonNull ConnectedDevicesAdapter.ViewHolder holder, int position) {
         holder.setClientId(connectedDevices.get(position).getEndpointId(), connectedDevices.get(position).getEndpointName());
         holder.setBatteryLevel(connectedDevices.get(position).getDeviceStats().getBatteryLevel());
-        holder.setRequestStatus(connectedDevices.get(position).getRequestStatus());
+        holder.setConnectionRequestState(connectedDevices.get(position).getRequestStatus());
     }
 
     @Override
@@ -51,13 +51,13 @@ public class ConnectedDevicesAdapter extends RecyclerView.Adapter<ConnectedDevic
 
         private TextView ClientId;
         private TextView BatteryLevel;
-        private ImageView RequestStatus;
+        private TextView connectionRequestState;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             ClientId = itemView.findViewById(R.id.client_id);
             BatteryLevel = itemView.findViewById(R.id.battery_level);
-            RequestStatus = itemView.findViewById(R.id.request_status_image);
+            connectionRequestState = itemView.findViewById(R.id.connection_request_state);
         }
 
         public void setClientId(String endpointId, String endpointName) {
@@ -72,13 +72,13 @@ public class ConnectedDevicesAdapter extends RecyclerView.Adapter<ConnectedDevic
             }
         }
 
-        public void setRequestStatus(String requestStatus) {
+        public void setConnectionRequestState(String requestStatus) {
             if (requestStatus.equals(Constants.RequestStatus.ACCEPTED)) {
-                this.RequestStatus.setBackgroundResource(R.drawable.ic_outline_check_circle_24);
+                this.connectionRequestState.setText("Accepted");
             } else if (requestStatus.equals(Constants.RequestStatus.REJECTED)) {
-                this.RequestStatus.setBackgroundResource(R.drawable.ic_outline_cancel_24);
+                this.connectionRequestState.setText("Rejected");
             } else {
-                this.RequestStatus.setBackgroundResource(R.drawable.ic_outline_pending_24);
+                this.connectionRequestState.setText("attempting connection");
             }
         }
     }

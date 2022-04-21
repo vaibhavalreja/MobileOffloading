@@ -3,6 +3,7 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="app/src/main/res/drawable/customborder.xml" value="0.186" />
         <entry key="app/src/main/res/drawable/ic_outline_cancel_24.xml" value="0.2275" />
         <entry key="app/src/main/res/drawable/ic_outline_check_circle_24.xml" value="0.2275" />
         <entry key="app/src/main/res/drawable/ic_outline_pending_24.xml" value="0.2275" />
