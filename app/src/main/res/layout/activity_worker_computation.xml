@@ -1,70 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center|center_vertical"
+    android:gravity="center_vertical|center_horizontal"
+    android:orientation="vertical"
     tools:context=".Worker_Computation">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:orientation="vertical">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Role: Worker"
+        android:textSize="30sp" />
 
-        <androidx.cardview.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="162dp"
-            android:layout_margin="10dp"
-            android:elevation="5dp"
-            app:cardCornerRadius="15dp"
-            app:cardUseCompatPadding="true">
+    <TextView
+        android:id="@+id/statusText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Work status: Waiting" />
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
+    <TextView
+        android:id="@+id/powerValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Charging status: Unknown" />
 
-                <RelativeLayout
-                    android:id="@+id/statusCard"
-                    android:layout_width="match_parent"
-                    android:layout_height="79dp"
-                    android:background="#48A7F3"
-                    android:padding="10dp">
-
-                    <TextView
-                        android:id="@+id/statusText"
-                        android:layout_width="183dp"
-                        android:layout_height="48dp"
-                        android:layout_alignParentRight="true"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginTop="5dp"
-                        android:layout_marginRight="159dp"
-                        android:text="Waiting for work..."
-                        android:textColor="#000000" />
-                </RelativeLayout>
-
-                <TextView
-                    android:id="@+id/powerValue"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="20dp"
-                    android:text="Power stats not available" />
-            </LinearLayout>
-
-        </androidx.cardview.widget.CardView>
-
-        <Button
-            android:id="@+id/button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="30dp"
-            android:backgroundTint="#48A7F3"
-            android:onClick="onDisconnect"
-            android:text="Disconnect"
-            app:cornerRadius="5dp" />
-    </LinearLayout>
+    <ImageButton
+        android:id="@+id/button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="onDisconnect"
+        android:src="@drawable/stop_img_foreground" />
+</LinearLayout>
 
 
-</RelativeLayout>

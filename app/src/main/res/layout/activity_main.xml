@@ -1,39 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
-    android:layout_weight="100"
-    android:orientation="vertical"
     android:layout_margin="10dp"
+    android:layout_weight="100"
+    android:gravity="center"
+    android:orientation="vertical"
     tools:context=".MainActivity">
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_weight="20"
+        android:gravity="center_horizontal|center_vertical"
         android:text="Select Role"
         android:textSize="50sp"
-        android:gravity="center_horizontal|center_vertical"
-        android:textStyle="bold|italic"
-        android:layout_weight="20"/>
+        android:textStyle="bold|italic" />
 
-        <Button
-            android:id="@+id/role_master"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="40"
-            android:text="Master"
-            android:textStyle="bold|italic" />
+    <Button
+        android:id="@+id/role_master"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="40"
+        android:text="Master"
+        android:textStyle="bold|italic" />
 
-        <Button
-            android:id="@+id/role_worker"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="40"
-            android:layout_marginTop="25dp"
-            android:text="Worker"
-            android:textStyle="bold|italic" />
+    <Button
+        android:id="@+id/role_worker"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="25dp"
+        android:layout_weight="40"
+        android:text="Worker"
+        android:textStyle="bold|italic" />
 
 </LinearLayout>

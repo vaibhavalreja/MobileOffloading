@@ -2,6 +2,7 @@ package com.group29.mobileoffloading;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -12,6 +13,7 @@ import android.provider.Settings;
 import android.util.Log;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.common.api.ApiException;
@@ -101,27 +103,26 @@ public class WorkerActivity extends AppCompatActivity {
         }
     }
 
-    void showDialog(String masterInfo) {
-        confirmationDialog = new BottomSheetDialog(this);
-        confirmationDialog.setContentView(R.layout.confirmation_dialog);
-        confirmationDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        confirmationDialog.findViewById(R.id.accept).setOnClickListener(v -> acceptConnection());
-        confirmationDialog.findViewById(R.id.reject).setOnClickListener(v -> rejectConnection());
-        TextView title = confirmationDialog.findViewById(R.id.dialogText);
-        title.setText(String.format("Do you want to pair with %s?", masterInfo));
-        confirmationDialog.show();
+    void showDialog(String masterNodeID) {
+        DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
+            switch (which){
+                case DialogInterface.BUTTON_POSITIVE:
+                    NearbyConnectionsManager.getInstance(getApplicationContext()).acceptConnection(masterId);
+                    confirmationDialog.dismiss();
+                    startWorkerComputation();
+                    break;
+
+                case DialogInterface.BUTTON_NEGATIVE:
+                    NearbyConnectionsManager.getInstance(getApplicationContext()).rejectConnection(masterId);
+                    break;
+            }
+        };
+        AlertDialog.Builder builder = new AlertDialog.Builder(getApplicationContext());
+        builder.setMessage("Do you want to pair with master node" + masterNodeID +"?").setPositiveButton("Yes", dialogClickListener)
+                .setNegativeButton("No", dialogClickListener).show();
     }
 
-    void acceptConnection() {
-        NearbyConnectionsManager.getInstance(getApplicationContext()).acceptConnection(masterId);
-        confirmationDialog.dismiss();
-        startWorkerComputation();
-    }
 
-    void rejectConnection() {
-        NearbyConnectionsManager.getInstance(getApplicationContext()).rejectConnection(masterId);
-        confirmationDialog.dismiss();
-    }
 
     @Override
     protected void onResume() {
