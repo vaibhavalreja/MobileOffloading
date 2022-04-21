@@ -62,7 +62,7 @@ public class WorkersAdapter extends RecyclerView.Adapter<WorkersAdapter.ViewHold
             tvClientId = itemView.findViewById(R.id.tv_client_id);
             tvWorkStatus = itemView.findViewById(R.id.tv_work_status);
             tvBatteryLevel = itemView.findViewById(R.id.tv_battery_level);
-            tvChargingStatus = itemView.findViewById(R.id.workerBattery);
+            tvChargingStatus = itemView.findViewById(R.id.workerBatteryState);
             tvWorkFinished = itemView.findViewById(R.id.tv_work_finished);
             tvLocation = itemView.findViewById(R.id.tv_location);
 
@@ -86,7 +86,7 @@ public class WorkersAdapter extends RecyclerView.Adapter<WorkersAdapter.ViewHold
 
         public void setBatteryLevel(int batteryLevel, boolean charging) {
             this.tvBatteryLevel.setText(batteryLevel + "%");
-            this.tvChargingStatus.setText(batteryLevel + "%");
+            this.tvChargingStatus.setText(String.valueOf(charging));
         }
 
         public void setWorkFinished(int amountWork) {
