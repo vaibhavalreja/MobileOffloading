@@ -108,7 +108,6 @@ public class WorkerActivity extends AppCompatActivity {
             switch (which){
                 case DialogInterface.BUTTON_POSITIVE:
                     NearbyConnectionsManager.getInstance(getApplicationContext()).acceptConnection(masterId);
-                    confirmationDialog.dismiss();
                     startWorkerComputation();
                     break;
 
@@ -117,8 +116,9 @@ public class WorkerActivity extends AppCompatActivity {
                     break;
             }
         };
-        AlertDialog.Builder builder = new AlertDialog.Builder(getApplicationContext());
-        builder.setMessage("Do you want to pair with master node" + masterNodeID +"?").setPositiveButton("Yes", dialogClickListener)
+        AlertDialog.Builder builder = new AlertDialog.Builder(WorkerActivity.this);
+        builder.setMessage("Do you want to pair with master node" + masterNodeID +"?")
+                .setPositiveButton("Yes", dialogClickListener)
                 .setNegativeButton("No", dialogClickListener).show();
     }
 

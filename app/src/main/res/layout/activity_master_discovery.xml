@@ -27,7 +27,7 @@
             android:layout_height="wrap_content"
             android:justificationMode="inter_word"
             android:text="Available Worker Nodes"
-            android:textSize="35sp"
+            android:textSize="30sp"
             android:textStyle="bold" />
 
         <TextView

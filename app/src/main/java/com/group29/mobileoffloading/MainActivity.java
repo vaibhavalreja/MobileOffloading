@@ -57,6 +57,9 @@ public class MainActivity extends AppCompatActivity {
                                 Manifest.permission.BLUETOOTH,
                                 Manifest.permission.CHANGE_WIFI_STATE,
                                 Manifest.permission.ACCESS_COARSE_LOCATION,
+                                Manifest.permission.BLUETOOTH_SCAN,
+                                Manifest.permission.BLUETOOTH_ADVERTISE,
+                                Manifest.permission.BLUETOOTH_CONNECT,
                                 Manifest.permission.ACCESS_BACKGROUND_LOCATION};
 
         for (String permission : permissions) {
