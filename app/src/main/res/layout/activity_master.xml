@@ -58,6 +58,7 @@
         android:layout_height="wrap_content"
         android:text="Execution time for Worker Nodes:"
         android:textSize="15sp"
-        android:textStyle="bold|italic" />
+        android:textStyle="bold|italic"
+        android:visibility="visible" />
 
 </LinearLayout>
