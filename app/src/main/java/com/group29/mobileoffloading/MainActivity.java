@@ -49,18 +49,20 @@ public class MainActivity extends AppCompatActivity {
     @RequiresApi(api = Build.VERSION_CODES.Q)
     private void checkAndAskPermissions() {
         ArrayList<String> permissionsToRequest = new ArrayList<String>();
-        String[] permissions = {Manifest.permission.READ_EXTERNAL_STORAGE,
-                                Manifest.permission.ACCESS_FINE_LOCATION,
-                                Manifest.permission.INTERNET,
-                                Manifest.permission.BLUETOOTH_ADMIN,
-                                Manifest.permission.ACCESS_WIFI_STATE,
-                                Manifest.permission.BLUETOOTH,
-                                Manifest.permission.CHANGE_WIFI_STATE,
-                                Manifest.permission.ACCESS_COARSE_LOCATION,
-                                Manifest.permission.BLUETOOTH_SCAN,
-                                Manifest.permission.BLUETOOTH_ADVERTISE,
-                                Manifest.permission.BLUETOOTH_CONNECT,
-                                Manifest.permission.ACCESS_BACKGROUND_LOCATION};
+        String[] permissions = {};//Manifest.permission.READ_EXTERNAL_STORAGE,
+                              //  Manifest.permission.ACCESS_FINE_LOCATION,
+                            //    Manifest.permission.INTERNET,
+                               // Manifest.permission.BLUETOOTH_ADMIN,
+                          //      Manifest.permission.ACCESS_WIFI_STATE,
+                               // Manifest.permission.BLUETOOTH,
+                            //    Manifest.permission.CHANGE_WIFI_STATE,
+                           //     Manifest.permission.ACCESS_COARSE_LOCATION,
+                           //     Manifest.permission.ACCESS_BACKGROUND_LOCATION};
+        if(Build.VERSION.SDK_INT >= 30){
+            permissionsToRequest.add(Manifest.permission.BLUETOOTH_SCAN);
+            permissionsToRequest.add(Manifest.permission.BLUETOOTH_ADVERTISE);
+            permissionsToRequest.add(Manifest.permission.BLUETOOTH_CONNECT);
+        }
 
         for (String permission : permissions) {
             if (ActivityCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
