@@ -55,7 +55,7 @@ public class Master_Discovery extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        setState("Stopped");
+        setState("Not searching");
         Nearby.getConnectionsClient(getApplicationContext()).stopDiscovery();
         NearbySingleton.getInstance(getApplicationContext()).unregisterPayloadListener(payloadListener);
         NearbySingleton.getInstance(getApplicationContext()).unregisterClientConnectionListener(clientConnectionListener);
@@ -235,13 +235,13 @@ public class Master_Discovery extends AppCompatActivity {
                     e.printStackTrace();
                 })
                 .addOnSuccessListener((unused) -> {
-                    setState("Searching");
+                    setState("Finding");
                 })
                 .addOnFailureListener(command -> {
                     if (((ApiException) command).getStatusCode() == 8002) {
-                        setState("Searching");
+                        setState("Finding");
                     } else {
-                        setState("Search Failed");
+                        setState("Error - try to enable location");
                         Log.d("TEST", "discovery failed");
                         finish();
                     }
