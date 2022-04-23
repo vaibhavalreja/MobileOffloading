@@ -71,7 +71,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="5dp"
-            android:text="Work Completed Percentage: " />
+            android:text="Work Completed: " />
 
         <TextView
             android:id="@+id/tv_work_finished"
@@ -89,7 +89,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="5dp"
-            android:text="Distance (Location):" />
+            android:text="Distance from master node(approx):" />
 
         <TextView
             android:id="@+id/tv_location"

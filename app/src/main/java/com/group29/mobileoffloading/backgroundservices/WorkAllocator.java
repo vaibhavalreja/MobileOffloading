@@ -25,7 +25,7 @@ import java.util.concurrent.LinkedBlockingDeque;
 
 public class WorkAllocator {
     private Context context;
-    private ArrayList<Worker> workers = new ArrayList<Worker>();
+    private ArrayList<Worker> workers = new ArrayList<>();
 
     private int[][] matrix1;
     private int[][] matrix2;

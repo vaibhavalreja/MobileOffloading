@@ -65,7 +65,7 @@ public class Worker_Computation extends AppCompatActivity {
         TextView statusText = findViewById(R.id.statusText);
         statusText.setText(text);
         TextView powerConsumed = findViewById(R.id.powerValue);
-        powerConsumed.setText("Power Consumption (Slave) : "  + Long.toString(energyConsumedWorker)+ " nWh");
+        powerConsumed.setText("Power Consumed : "  + Long.toString(energyConsumedWorker)+ " nWh");
     }
 
 
@@ -166,7 +166,7 @@ public class Worker_Computation extends AppCompatActivity {
         try {
             ClientPayLoad receivedPayload = PayloadConverter.fromPayload(payload);
             if (receivedPayload.getTag().equals(Constants.PayloadTags.WORK_DATA)) {
-                setStatusText("Working now", true);
+                setStatusText("Work status: Computing", true);
 
                 WorkData workData = (WorkData) receivedPayload.getData();
                 int dotProduct = MatrixDS.getDotProduct(workData.getRows(), workData.getCols());

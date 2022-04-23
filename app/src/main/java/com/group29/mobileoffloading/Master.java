@@ -66,7 +66,7 @@ public class Master extends AppCompatActivity {
 
         Log.d("MasterDiscovery", "Starting computing matrix multiplication on only master");
         TextView masterPower = findViewById(R.id.masterPower);
-        masterPower.setText("Stats not available");
+        masterPower.setText("Power Consumption for Master Node: null");
         BatteryManager mBatteryManager =
                 (BatteryManager)getSystemService(Context.BATTERY_SERVICE);
         Long initialEnergyMaster =
@@ -75,7 +75,7 @@ public class Master extends AppCompatActivity {
         Long finalEnergyMaster =
                 mBatteryManager.getLongProperty(BatteryManager.BATTERY_PROPERTY_ENERGY_COUNTER);
         Long energyConsumedMaster = Math.abs(initialEnergyMaster-finalEnergyMaster);
-        masterPower.setText("Power Consumption (Master): " +Long.toString(energyConsumedMaster)+ " nWh");
+        masterPower.setText("Power Consumption for Master Node: " +Long.toString(energyConsumedMaster)+ " nWh");
         Log.d("MasterDiscovery", "Completed computing matrix multiplication on only master");
 
         unpackBundle();
@@ -118,11 +118,11 @@ public class Master extends AppCompatActivity {
         matrix1 = MatrixDS.createMatrix(rows1, cols1);
         matrix2 = MatrixDS.createMatrix(rows2, cols2);
         TextView totalPart = findViewById(R.id.totalPartitions);
-        totalPart.setText("Total Partitions: " + totalPartitions);
+        totalPart.setText("Matrix Partitions: " + totalPartitions);
 
         workAllocator = new WorkAllocator(getApplicationContext(), workers, matrix1, matrix2, slaveTime -> {
             TextView slave = findViewById(R.id.slaveTime);
-            slave.setText("Execution time (Slave): " + slaveTime + "ms");
+            slave.setText("Execution time for Worker Nodes: " + slaveTime + "ms");
         });
         workAllocator.beginDistributedComputation();
     }
@@ -193,7 +193,7 @@ public class Master extends AppCompatActivity {
             long totalTime = endTime - startTime;
             FlushToFile.writeTextToFile(getApplicationContext(), "exec_time_master_alone.txt", false, totalTime + "ms");
             TextView master = findViewById(R.id.masterTime);
-            master.setText("Execution time (Master): " + totalTime + "ms");
+            master.setText("Execution time for Master Node: " + totalTime + "ms");
         });
     }
 

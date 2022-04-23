@@ -35,6 +35,15 @@
         android:textSize="15sp"
         android:textStyle="bold|italic" />
 
+
+    <TextView
+        android:id="@+id/masterPower"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Power Consumption for Master Node:"
+        android:textSize="15sp"
+        android:textStyle="bold|italic" />
+
     <TextView
         android:id="@+id/masterTime"
         android:layout_width="match_parent"
@@ -51,11 +60,4 @@
         android:textSize="15sp"
         android:textStyle="bold|italic" />
 
-    <TextView
-        android:id="@+id/masterPower"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Power Consumption for Master Node:"
-        android:textSize="15sp"
-        android:textStyle="bold|italic" />
 </LinearLayout>

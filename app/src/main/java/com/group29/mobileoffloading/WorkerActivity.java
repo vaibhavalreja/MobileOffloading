@@ -32,7 +32,6 @@ public class WorkerActivity extends AppCompatActivity {
     private String workerId;
     private String masterId = "";
     private ClientConnectionListener connectionListener;
-    private Dialog confirmationDialog;
     private DeviceInfoBroadcaster deviceInfoBroadcaster;
     private Handler handler;
     private Runnable runnable;
@@ -87,9 +86,9 @@ public class WorkerActivity extends AppCompatActivity {
 
     void refreshCardData() {
         TextView st = findViewById(R.id.percentage);
-        st.setText("Percentage: " + DeviceInfoBroadcaster.getBatteryLevel(this) + "%");
+        st.setText("Level: " + DeviceInfoBroadcaster.getBatteryLevel(this) + "%");
         TextView st2 = findViewById(R.id.plugged);
-        st2.setText(String.format("Charging Status: %s", DeviceInfoBroadcaster.isPluggedIn(this) ? "Plugged In" : "Not Charging"));
+        st2.setText(String.format("Plugged In: %s", DeviceInfoBroadcaster.isPluggedIn(this) ? "Plugged In" : "Not Charging"));
         if (DeviceInfoBroadcaster.getLocation(this) != null) {
             TextView la = findViewById(R.id.latitude);
             la.setText(String.format("Latitude: %s", DeviceInfoBroadcaster.getLocation(this).getLatitude()));
