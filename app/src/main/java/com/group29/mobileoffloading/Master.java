@@ -17,7 +17,7 @@ import com.group29.mobileoffloading.listeners.WorkerStatusListener;
 import com.group29.mobileoffloading.DataModels.Worker;
 import com.group29.mobileoffloading.CustomListAdapters.WorkersAdapter;
 import com.group29.mobileoffloading.backgroundservices.DeviceInfoBroadcaster;
-import com.group29.mobileoffloading.backgroundservices.NearbyConnectionsManager;
+import com.group29.mobileoffloading.backgroundservices.NearbySingleton;
 import com.group29.mobileoffloading.backgroundservices.WorkAllocator;
 import com.group29.mobileoffloading.backgroundservices.WorkerStatusSubscriber;
 import com.group29.mobileoffloading.DataModels.ConnectedDevice;
@@ -107,7 +107,7 @@ public class Master extends AppCompatActivity {
         for (com.group29.mobileoffloading.DataModels.Worker w : workers) {
             updateWorkerConnectionStatus(w.getEndpointId(), Constants.WorkStatus.DISCONNECTED);
             workAllocator.removeWorker(w.getEndpointId());
-            NearbyConnectionsManager.getInstance(getApplicationContext()).disconnectFromEndpoint(w.getEndpointId());
+            NearbySingleton.getInstance(getApplicationContext()).disconnectFromEndpoint(w.getEndpointId());
         }
         super.onBackPressed();
         finish();
@@ -238,7 +238,7 @@ public class Master extends AppCompatActivity {
                     if (workStatus.getStatusInfo().equals(Constants.WorkStatus.DISCONNECTED)) {
                         updateWorkerConnectionStatus(endpointId, Constants.WorkStatus.DISCONNECTED);
                         workAllocator.removeWorker(endpointId);
-                        NearbyConnectionsManager.getInstance(getApplicationContext()).rejectConnection(endpointId);
+                        NearbySingleton.getInstance(getApplicationContext()).rejectConnection(endpointId);
                     } else {
                         updateWorkerStatus(endpointId, workStatus);
                     }

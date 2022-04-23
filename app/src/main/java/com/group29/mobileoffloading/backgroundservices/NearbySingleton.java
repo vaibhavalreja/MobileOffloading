@@ -20,9 +20,9 @@ import com.group29.mobileoffloading.listeners.PayloadListener;
 
 import java.util.HashSet;
 
-public class NearbyConnectionsManager {
+public class NearbySingleton {
 
-    private static NearbyConnectionsManager nearbyConnectionsManager;
+    private static NearbySingleton nearbySingleton;
     private Context context;
 
     private ConnectionLifecycleCallback connectionLifecycleCallback;
@@ -30,7 +30,7 @@ public class NearbyConnectionsManager {
 
     private HashSet<PayloadListener> payloadListenersSet = new HashSet<>();
 
-    public NearbyConnectionsManager(Context context) {
+    public NearbySingleton(Context context) {
         this.context = context;
         this.connectionLifecycleCallback = new ConnectionLifecycleCallback() {
             @Override
@@ -69,12 +69,12 @@ public class NearbyConnectionsManager {
         };
     }
 
-    public static NearbyConnectionsManager getInstance(Context context) {
-        if (nearbyConnectionsManager == null) {
-            nearbyConnectionsManager = new NearbyConnectionsManager(context);
+    public static NearbySingleton getInstance(Context context) {
+        if (nearbySingleton == null) {
+            nearbySingleton = new NearbySingleton(context);
         }
 
-        return nearbyConnectionsManager;
+        return nearbySingleton;
     }
 
     public void requestConnection(String endpointId, String clientId) {
@@ -153,7 +153,5 @@ public class NearbyConnectionsManager {
         }
         return false;
     }
-
-
 }
 

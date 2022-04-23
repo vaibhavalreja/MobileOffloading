@@ -1,7 +1,9 @@
 package com.group29.mobileoffloading;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -26,7 +28,7 @@ import com.google.android.gms.nearby.connection.PayloadTransferUpdate;
 import com.google.android.gms.nearby.connection.Strategy;
 import com.group29.mobileoffloading.CustomListAdapters.ConnectedDevicesAdapter;
 import com.group29.mobileoffloading.backgroundservices.Connector;
-import com.group29.mobileoffloading.backgroundservices.NearbyConnectionsManager;
+import com.group29.mobileoffloading.backgroundservices.NearbySingleton;
 import com.group29.mobileoffloading.backgroundservices.WorkAllocator;
 import com.group29.mobileoffloading.listeners.ClientConnectionListener;
 import com.group29.mobileoffloading.listeners.PayloadListener;
@@ -48,28 +50,31 @@ public class Master_Discovery extends AppCompatActivity {
     private ClientConnectionListener clientConnectionListener;
     private PayloadListener payloadListener;
     private DiscoveryOptions discoveryOptions;
+    private String masterNodeId;
 
     @Override
     protected void onPause() {
         super.onPause();
         setState("Stopped");
         Nearby.getConnectionsClient(getApplicationContext()).stopDiscovery();
-        NearbyConnectionsManager.getInstance(getApplicationContext()).unregisterPayloadListener(payloadListener);
-        NearbyConnectionsManager.getInstance(getApplicationContext()).unregisterClientConnectionListener(clientConnectionListener);
+        NearbySingleton.getInstance(getApplicationContext()).unregisterPayloadListener(payloadListener);
+        NearbySingleton.getInstance(getApplicationContext()).unregisterClientConnectionListener(clientConnectionListener);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         startMasterDiscovery();
-        NearbyConnectionsManager.getInstance(getApplicationContext()).registerPayloadListener(payloadListener);
-        NearbyConnectionsManager.getInstance(getApplicationContext()).registerClientConnectionListener(clientConnectionListener);
+        NearbySingleton.getInstance(getApplicationContext()).registerPayloadListener(payloadListener);
+        NearbySingleton.getInstance(getApplicationContext()).registerClientConnectionListener(clientConnectionListener);
     }
 
+    @SuppressLint("HardwareIds")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_master_discovery);
+        masterNodeId = Settings.Secure.getString(getApplicationContext().getContentResolver(), Settings.Secure.ANDROID_ID);
         this.discoveryOptions = new DiscoveryOptions.Builder().setStrategy(Strategy.P2P_CLUSTER).build();
 
         rvConnectedDevices = findViewById(R.id.rv_connected_devices);
@@ -106,7 +111,7 @@ public class Master_Discovery extends AppCompatActivity {
             @Override
             public void onConnectionInitiated(String endpointId, ConnectionInfo connectionInfo) {
                 Log.d("MASTER_DISCOVERY", "clientConnectionListener -  onConnectionInitiated");
-                NearbyConnectionsManager.getInstance(getApplicationContext()).acceptConnection(endpointId);
+                NearbySingleton.getInstance(getApplicationContext()).acceptConnection(endpointId);
             }
 
             @Override
@@ -207,7 +212,7 @@ public class Master_Discovery extends AppCompatActivity {
 
                 Log.d("MASTER_DISCOVERY", "Added end point to connected devices : " +endpointId);
 
-                NearbyConnectionsManager.getInstance(getApplicationContext()).requestConnection(endpointId, "MASTER");
+                NearbySingleton.getInstance(getApplicationContext()).requestConnection(endpointId, masterNodeId);
                 Log.d("MASTER_DISCOVERY", "Requested connection for : " +endpointId);
 
             }

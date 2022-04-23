@@ -15,7 +15,7 @@ import com.google.android.gms.nearby.connection.ConnectionResolution;
 import com.google.android.gms.nearby.connection.Payload;
 import com.google.android.gms.nearby.connection.PayloadTransferUpdate;
 import com.group29.mobileoffloading.backgroundservices.DeviceInfoBroadcaster;
-import com.group29.mobileoffloading.backgroundservices.NearbyConnectionsManager;
+import com.group29.mobileoffloading.backgroundservices.NearbySingleton;
 import com.group29.mobileoffloading.listeners.ClientConnectionListener;
 import com.group29.mobileoffloading.listeners.PayloadListener;
 import com.group29.mobileoffloading.DataModels.ClientPayLoad;
@@ -96,7 +96,7 @@ public class Worker_Computation extends AppCompatActivity {
 
             }
         };
-        NearbyConnectionsManager.getInstance(getApplicationContext()).acceptConnection(masterId);
+        NearbySingleton.getInstance(getApplicationContext()).acceptConnection(masterId);
     }
 
     private void setConnectionCallback() {
@@ -124,23 +124,23 @@ public class Worker_Computation extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        NearbyConnectionsManager.getInstance(getApplicationContext()).registerPayloadListener(payloadCallback);
-        NearbyConnectionsManager.getInstance(getApplicationContext()).registerClientConnectionListener(connectionListener);
+        NearbySingleton.getInstance(getApplicationContext()).registerPayloadListener(payloadCallback);
+        NearbySingleton.getInstance(getApplicationContext()).registerClientConnectionListener(connectionListener);
         deviceStatsPublisher.start();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        NearbyConnectionsManager.getInstance(getApplicationContext()).unregisterPayloadListener(payloadCallback);
-        NearbyConnectionsManager.getInstance(getApplicationContext()).unregisterClientConnectionListener(connectionListener);
+        NearbySingleton.getInstance(getApplicationContext()).unregisterPayloadListener(payloadCallback);
+        NearbySingleton.getInstance(getApplicationContext()).unregisterClientConnectionListener(connectionListener);
         deviceStatsPublisher.stop();
     }
 
     @Override
     public void finish() {
         super.finish();
-        NearbyConnectionsManager.getInstance(getApplicationContext()).disconnectFromEndpoint(masterId);
+        NearbySingleton.getInstance(getApplicationContext()).disconnectFromEndpoint(masterId);
         currentPartitionIndex = 0;
     }
 

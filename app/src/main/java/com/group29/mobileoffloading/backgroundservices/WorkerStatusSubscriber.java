@@ -55,12 +55,12 @@ public class WorkerStatusSubscriber {
             }
         };
 
-        NearbyConnectionsManager.getInstance(context).registerPayloadListener(payloadListener);
-        NearbyConnectionsManager.getInstance(context).acceptConnection(endpointId);
+        NearbySingleton.getInstance(context).registerPayloadListener(payloadListener);
+        NearbySingleton.getInstance(context).acceptConnection(endpointId);
     }
 
     public void stop() {
-        NearbyConnectionsManager.getInstance(context).unregisterPayloadListener(payloadListener);
+        NearbySingleton.getInstance(context).unregisterPayloadListener(payloadListener);
     }
 
 }

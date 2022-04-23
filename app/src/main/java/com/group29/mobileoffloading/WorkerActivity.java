@@ -1,11 +1,8 @@
 package com.group29.mobileoffloading;
 
 import android.annotation.SuppressLint;
-import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -22,9 +19,8 @@ import com.google.android.gms.nearby.connection.AdvertisingOptions;
 import com.google.android.gms.nearby.connection.ConnectionInfo;
 import com.google.android.gms.nearby.connection.ConnectionResolution;
 import com.google.android.gms.nearby.connection.Strategy;
-import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.group29.mobileoffloading.backgroundservices.DeviceInfoBroadcaster;
-import com.group29.mobileoffloading.backgroundservices.NearbyConnectionsManager;
+import com.group29.mobileoffloading.backgroundservices.NearbySingleton;
 import com.group29.mobileoffloading.listeners.ClientConnectionListener;
 import com.group29.mobileoffloading.utilities.Constants;
 
@@ -106,12 +102,12 @@ public class WorkerActivity extends AppCompatActivity {
         DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
             switch (which){
                 case DialogInterface.BUTTON_POSITIVE:
-                    NearbyConnectionsManager.getInstance(getApplicationContext()).acceptConnection(masterId);
+                    NearbySingleton.getInstance(getApplicationContext()).acceptConnection(masterId);
                     startWorkerComputation();
                     break;
 
                 case DialogInterface.BUTTON_NEGATIVE:
-                    NearbyConnectionsManager.getInstance(getApplicationContext()).rejectConnection(masterId);
+                    NearbySingleton.getInstance(getApplicationContext()).rejectConnection(masterId);
                     break;
             }
         };
@@ -127,7 +123,7 @@ public class WorkerActivity extends AppCompatActivity {
     protected void onResume() {
         setState("Initializing...");
         super.onResume();
-        NearbyConnectionsManager.getInstance(getApplicationContext()).advertise(workerId, advertisingOptions).addOnSuccessListener(command -> {
+        NearbySingleton.getInstance(getApplicationContext()).advertise(workerId, advertisingOptions).addOnSuccessListener(command -> {
             Log.d("WORKER", "Discoverable by all devices");
             setState("Discoverable by all devices");
         }).addOnFailureListener(c -> {
@@ -138,7 +134,7 @@ public class WorkerActivity extends AppCompatActivity {
                 setState("Failed to host device");
             }
         });
-        NearbyConnectionsManager.getInstance(getApplicationContext()).registerClientConnectionListener(connectionListener);
+        NearbySingleton.getInstance(getApplicationContext()).registerClientConnectionListener(connectionListener);
         Log.d("WORKER", "Starting Device Stats");
         deviceInfoBroadcaster.start();
         handler.postDelayed(runnable, Constants.UPDATE_INTERVAL_UI);
@@ -147,7 +143,7 @@ public class WorkerActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        NearbyConnectionsManager.getInstance(getApplicationContext()).unregisterClientConnectionListener(connectionListener);
+        NearbySingleton.getInstance(getApplicationContext()).unregisterClientConnectionListener(connectionListener);
         Log.d("WORKER", "Stopping Device Stats");
         deviceInfoBroadcaster.stop();
         handler.removeCallbacks(runnable);
@@ -169,8 +165,8 @@ public class WorkerActivity extends AppCompatActivity {
         Nearby.getConnectionsClient(getApplicationContext()).stopAdvertising();
         Log.d("WORKER", "Device is not discoverable");
         if (!masterId.equals("")) {
-            NearbyConnectionsManager.getInstance(getApplicationContext()).disconnectFromEndpoint(masterId);
-            NearbyConnectionsManager.getInstance(getApplicationContext()).rejectConnection(masterId);
+            NearbySingleton.getInstance(getApplicationContext()).disconnectFromEndpoint(masterId);
+            NearbySingleton.getInstance(getApplicationContext()).rejectConnection(masterId);
         }
         finish();
         super.onBackPressed();

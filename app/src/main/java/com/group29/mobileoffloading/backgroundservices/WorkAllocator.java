@@ -255,7 +255,7 @@ public class WorkAllocator {
 
                 //TODO: Send data to device on connection. Done
                 Connector.sendToDevice(context, worker.getEndpointId(), payload);
-                NearbyConnectionsManager.getInstance(context).rejectConnection(worker.getEndpointId());
+                NearbySingleton.getInstance(context).rejectConnection(worker.getEndpointId());
             }
         }
 
