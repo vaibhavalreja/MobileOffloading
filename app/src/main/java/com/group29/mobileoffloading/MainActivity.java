@@ -10,24 +10,36 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
     private final int REQUEST_CODE_FOR_PERMISSION = 12345;
+    String selectedRole = "Master";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        ((Button)findViewById(R.id.role_master)).setOnClickListener(view -> {
-            Intent intent = new Intent(getApplicationContext(), Master_Discovery.class);
-            startActivity(intent);
-        });
 
-        ((Button)findViewById(R.id.role_worker)).setOnClickListener(view -> {
-            Intent intent = new Intent(getApplicationContext(), WorkerActivity.class);
+        Spinner spinner = (Spinner) findViewById(R.id.app_role_spinner);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.app_roles_array, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+        spinner.setOnItemSelectedListener(this);
+
+        (findViewById(R.id.app_role_submit)).setOnClickListener(view -> {
+            Intent intent = new Intent(getApplicationContext(), Master_Discovery.class);
+            if(!selectedRole.equals("Master")){
+                intent = new Intent(getApplicationContext(), WorkerActivity.class);
+            }
             startActivity(intent);
         });
     }
@@ -59,9 +71,9 @@ public class MainActivity extends AppCompatActivity {
                            //     Manifest.permission.ACCESS_COARSE_LOCATION,
                            //     Manifest.permission.ACCESS_BACKGROUND_LOCATION};
         if(Build.VERSION.SDK_INT >= 30){
-            permissionsToRequest.add(Manifest.permission.BLUETOOTH_SCAN);
-            permissionsToRequest.add(Manifest.permission.BLUETOOTH_ADVERTISE);
-            permissionsToRequest.add(Manifest.permission.BLUETOOTH_CONNECT);
+            //permissionsToRequest.add(Manifest.permission.BLUETOOTH_SCAN);
+            //permissionsToRequest.add(Manifest.permission.BLUETOOTH_ADVERTISE);
+            //permissionsToRequest.add(Manifest.permission.BLUETOOTH_CONNECT);
         }
 
         for (String permission : permissions) {
@@ -81,5 +93,16 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         checkAndAskPermissions();
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+        selectedRole  = (String) adapterView.getItemAtPosition(i);
+        Log.d("ROLE", selectedRole+i);
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> adapterView) {
+
     }
 }

@@ -4,39 +4,39 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="10dp"
-    android:gravity="center"
+    android:padding="10dp"
     android:orientation="vertical"
+    android:gravity="center_horizontal|center_vertical"
     tools:context=".MainActivity">
-
+<LinearLayout
+    android:background="@drawable/customborder"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_horizontal|center_vertical"
+        android:gravity="center_vertical|center_horizontal"
         android:text="Select Role"
+        android:textColor="@color/teal_200"
         android:textSize="50sp"
+        android:layout_marginBottom="10dp"
         android:textStyle="bold|italic" />
 
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <Button
-            android:id="@+id/role_master"
-            android:layout_width="wrap_content"
-            android:layout_height="90dp"
-            android:layout_margin="5dp"
-            android:text="Master"
-            android:textStyle="bold|italic" />
-
-        <Button
-            android:id="@+id/role_worker"
-            android:layout_width="wrap_content"
-            android:layout_height="90dp"
-            android:layout_margin="5dp"
-            android:text="Worker"
-            android:textStyle="bold|italic" />
-    </LinearLayout>
+    <Spinner
+        android:textAlignment="center"
+        android:background="@drawable/customborder"
+        android:id="@+id/app_role_spinner"
+        android:layout_width="match_parent"
+        android:layout_marginBottom="10dp"
+        android:gravity="center_horizontal|center_vertical"
+        android:layout_height="wrap_content"/>
+    <Button
+        android:id="@+id/app_role_submit"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:text="Submit"
+        android:textStyle="bold|italic" />
+</LinearLayout>
 
 </LinearLayout>
