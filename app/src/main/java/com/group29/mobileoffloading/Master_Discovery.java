@@ -277,7 +277,7 @@ public class Master_Discovery extends AppCompatActivity {
 
     void canAssign(DeviceInfo deviceStats) {
         Button assignButton = findViewById(R.id.assignTask);
-        assignButton.setVisibility(deviceStats.getBatteryLevel() > WorkAllocator.ThresholdsHolder.MINIMUM_BATTERY_LEVEL ? View.VISIBLE : View.INVISIBLE);
+        assignButton.setEnabled(deviceStats.getBatteryLevel() > WorkAllocator.ThresholdsHolder.MINIMUM_BATTERY_LEVEL);
     }
 
     void setState(String text) {

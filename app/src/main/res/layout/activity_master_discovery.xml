@@ -26,7 +26,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:justificationMode="inter_word"
-            android:text="Available Worker Nodes"
+            android:text="Discovered Worker Nodes"
             android:textSize="30sp"
             android:textStyle="bold" />
 
@@ -66,11 +66,11 @@
     </LinearLayout>
 
     <Button
+        android:enabled="false"
         android:id="@+id/assignTask"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical|center_horizontal"
         android:onClick="assignTasks"
-        android:text="Distribute Work"
-        android:visibility="invisible" />
+        android:text="Distribute Work"/>
 </LinearLayout>

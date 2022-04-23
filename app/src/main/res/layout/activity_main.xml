@@ -32,6 +32,7 @@
         android:gravity="center_horizontal|center_vertical"
         android:layout_height="wrap_content"/>
     <Button
+        android:backgroundTint="@color/teal_200"
         android:id="@+id/app_role_submit"
         android:layout_width="match_parent"
         android:layout_height="50dp"
