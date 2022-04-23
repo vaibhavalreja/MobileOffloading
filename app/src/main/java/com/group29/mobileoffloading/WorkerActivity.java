@@ -83,8 +83,7 @@ public class WorkerActivity extends AppCompatActivity {
     void refreshCardData() {
         TextView st = findViewById(R.id.percentage);
         st.setText("Level: " + DeviceInfoBroadcaster.getBatteryLevel(this) + "%");
-        TextView st2 = findViewById(R.id.plugged);
-        st2.setText(String.format("Plugged In: %s", DeviceInfoBroadcaster.isPluggedIn(this) ? "Plugged In" : "Not Charging"));
+        ((TextView)findViewById(R.id.plugged)).setText(String.format("Plugged In: %s", DeviceInfoBroadcaster.isPluggedIn(this) ? "true" : "false"));
         if (DeviceInfoBroadcaster.getLocation(this) != null) {
             TextView la = findViewById(R.id.latitude);
             la.setText(String.format("Latitude: %s", DeviceInfoBroadcaster.getLocation(this).getLatitude()));
