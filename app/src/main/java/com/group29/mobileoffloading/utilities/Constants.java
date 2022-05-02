@@ -1,8 +1,6 @@
 package com.group29.mobileoffloading.utilities;
 
 public class Constants {
-    public static final int matrix_rows = 100;
-    public static final int matrix_columns = 100;
 
     public static final String CONNECTED_DEVICES = "CONNECTED_DEVICES";
     public static final String MASTER_ENDPOINT_ID = "MASTER_ENDPOINT_ID";

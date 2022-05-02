@@ -2,7 +2,7 @@ package com.group29.mobileoffloading.DataModels;
 
 import java.io.Serializable;
 
-public class ConnectedDevice implements Serializable {
+public class AvailableWorker implements Serializable {
     private String endpointId;
     private String endpointName;
     private DeviceInfo deviceInfo;

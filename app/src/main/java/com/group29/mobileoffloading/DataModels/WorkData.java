@@ -7,8 +7,6 @@ public class WorkData implements Serializable {
     private int[] rows;
     private int[] cols;
 
-    private int amountWork;
-
     public int getPartitionIndex() {
         return partitionIndex;
     }

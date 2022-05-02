@@ -15,20 +15,20 @@ import androidx.recyclerview.widget.SimpleItemAnimator;
 
 import com.group29.mobileoffloading.listeners.WorkerStatusListener;
 import com.group29.mobileoffloading.DataModels.Worker;
-import com.group29.mobileoffloading.CustomListAdapters.WorkersAdapter;
+import com.group29.mobileoffloading.CustomListAdapters.WorkingWorkersAdapter;
 import com.group29.mobileoffloading.backgroundservices.DeviceInfoBroadcaster;
 import com.group29.mobileoffloading.backgroundservices.NearbySingleton;
 import com.group29.mobileoffloading.backgroundservices.WorkAllocator;
 import com.group29.mobileoffloading.backgroundservices.WorkerStatusSubscriber;
-import com.group29.mobileoffloading.DataModels.ConnectedDevice;
+import com.group29.mobileoffloading.DataModels.AvailableWorker;
 import com.group29.mobileoffloading.DataModels.DeviceInfo;
 import com.group29.mobileoffloading.DataModels.WorkInfo;
 import com.group29.mobileoffloading.utilities.Constants;
 import com.group29.mobileoffloading.utilities.FlushToFile;
-import com.group29.mobileoffloading.utilities.MatrixDS;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Random;
 
 import needle.Needle;
 
@@ -39,14 +39,14 @@ public class Master extends AppCompatActivity {
     private HashMap<String, WorkerStatusSubscriber> workerStatusSubscriberMap = new HashMap<>();
 
     private ArrayList<com.group29.mobileoffloading.DataModels.Worker> workers = new ArrayList<>();
-    private WorkersAdapter workersAdapter;
+    private WorkingWorkersAdapter workingWorkersAdapter;
 
 
-
-    private int rows1 = Constants.matrix_rows;
-    private int cols1 = Constants.matrix_columns;
-    private int rows2 = Constants.matrix_columns;
-    private int cols2 = Constants.matrix_rows;
+    // Matrix size definition
+    private int rows1 = 40;
+    private int cols1 = 40;
+    private int rows2 = 40;
+    private int cols2 = 40;
 
     private int[][] matrix1;
     private int[][] matrix2;
@@ -65,8 +65,8 @@ public class Master extends AppCompatActivity {
         setContentView(R.layout.activity_master);
 
         Log.d("MasterDiscovery", "Starting computing matrix multiplication on only master");
-        TextView masterPower = findViewById(R.id.masterPower);
-        masterPower.setText("Power Consumption for Master Node: null");
+        TextView power_consumed_master_tv = findViewById(R.id.power_consumed_master_tv);
+        power_consumed_master_tv.setText("Power Consumption for Master Node: null");
         BatteryManager mBatteryManager =
                 (BatteryManager)getSystemService(Context.BATTERY_SERVICE);
         Long initialEnergyMaster =
@@ -75,7 +75,7 @@ public class Master extends AppCompatActivity {
         Long finalEnergyMaster =
                 mBatteryManager.getLongProperty(BatteryManager.BATTERY_PROPERTY_ENERGY_COUNTER);
         Long energyConsumedMaster = Math.abs(initialEnergyMaster-finalEnergyMaster);
-        masterPower.setText("Power Consumption for Master Node: " +Long.toString(energyConsumedMaster)+ " nWh");
+        power_consumed_master_tv.setText("Power Consumption for Master Node: " +Long.toString(energyConsumedMaster)+ " nWh");
         Log.d("MasterDiscovery", "Completed computing matrix multiplication on only master");
 
         unpackBundle();
@@ -115,35 +115,46 @@ public class Master extends AppCompatActivity {
 
     private void init() {
         totalPartitions = rows1 * cols2;
-        matrix1 = MatrixDS.createMatrix(rows1, cols1);
-        matrix2 = MatrixDS.createMatrix(rows2, cols2);
-        TextView totalPart = findViewById(R.id.totalPartitions);
-        totalPart.setText("Matrix Partitions: " + totalPartitions);
+        matrix1 = generateMatrix(rows1, cols1);
+        matrix2 = generateMatrix(rows2, cols2);
+        TextView totalPart = findViewById(R.id.work_array_partitions_tv);
+        totalPart.setText("Number of Work Partitions:" + totalPartitions);
 
         workAllocator = new WorkAllocator(getApplicationContext(), workers, matrix1, matrix2, slaveTime -> {
-            TextView slave = findViewById(R.id.slaveTime);
+            TextView slave = findViewById(R.id.worker_execution_time);
             slave.setText("Execution time for Worker Nodes: " + slaveTime + "ms");
         });
         workAllocator.beginDistributedComputation();
     }
 
+    public int[][] generateMatrix(int num_rows, int num_cols){
+        int [][] matrix = new int[num_rows][num_cols];
+        Random rand = new Random();
+
+        for(int i = 0; i < num_rows; i++){
+            for(int j = 0 ; j < num_cols; j++){
+                matrix[i][j] = rand.nextInt(200);
+            }
+        }
+        return matrix;
+    }
 
 
     private void bindViews() {
-        rvWorkers = findViewById(R.id.rv_workers);
+        rvWorkers = findViewById(R.id.workers_recycle_view);
         SimpleItemAnimator itemAnimator = (SimpleItemAnimator) rvWorkers.getItemAnimator();
         itemAnimator.setSupportsChangeAnimations(false);
     }
 
 
     private void setAdapters() {
-        workersAdapter = new WorkersAdapter(this, workers);
+        workingWorkersAdapter = new WorkingWorkersAdapter(this, workers);
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());
         rvWorkers.setLayoutManager(linearLayoutManager);
 
-        rvWorkers.setAdapter(workersAdapter);
-        workersAdapter.notifyDataSetChanged();
+        rvWorkers.setAdapter(workingWorkersAdapter);
+        workingWorkersAdapter.notifyDataSetChanged();
     }
 
 
@@ -151,19 +162,19 @@ public class Master extends AppCompatActivity {
         try {
             Bundle bundle = getIntent().getExtras();
 
-            ArrayList<ConnectedDevice> connectedDevices = (ArrayList<ConnectedDevice>) bundle.getSerializable(Constants.CONNECTED_DEVICES);
-            addToWorkers(connectedDevices);
+            ArrayList<AvailableWorker> availableWorkers = (ArrayList<AvailableWorker>) bundle.getSerializable(Constants.CONNECTED_DEVICES);
+            addToWorkers(availableWorkers);
             Log.d("CHECK", "Added a connected Device as worker");
         } catch (NullPointerException e) {
             e.printStackTrace();
         }
     }
 
-    private void addToWorkers(ArrayList<ConnectedDevice> connectedDevices) {
-        for (ConnectedDevice connectedDevice : connectedDevices) {
+    private void addToWorkers(ArrayList<AvailableWorker> availableWorkers) {
+        for (AvailableWorker availableWorker : availableWorkers) {
             com.group29.mobileoffloading.DataModels.Worker worker = new com.group29.mobileoffloading.DataModels.Worker();
-            worker.setEndpointId(connectedDevice.getEndpointId());
-            worker.setEndpointName(connectedDevice.getEndpointName());
+            worker.setEndpointId(availableWorker.getEndpointId());
+            worker.setEndpointName(availableWorker.getEndpointName());
 
             WorkInfo workStatus = new WorkInfo();
             workStatus.setStatusInfo(Constants.WorkStatus.WORKING);
@@ -176,8 +187,8 @@ public class Master extends AppCompatActivity {
     }
 
     private void computeMatrixMultiplicationOnMaster() {
-        matrix1 = MatrixDS.createMatrix(rows1, cols1);
-        matrix2 = MatrixDS.createMatrix(rows2, cols2);
+        matrix1 = generateMatrix(rows1, cols1);
+        matrix2 = generateMatrix(rows2, cols2);
         Needle.onBackgroundThread().execute(() -> {
             long startTime = System.currentTimeMillis();
             int[][] mul = new int[rows1][cols2];
@@ -218,7 +229,7 @@ public class Master extends AppCompatActivity {
             Log.d("DISCONNECTED--", workers.get(i).getEndpointId());
             if (workers.get(i).getEndpointId().equals(endpointId)) {
                 workers.get(i).getWorkStatus().setStatusInfo(status);
-                workersAdapter.notifyDataSetChanged();
+                workingWorkersAdapter.notifyDataSetChanged();
                 break;
             }
         }
@@ -288,7 +299,7 @@ public class Master extends AppCompatActivity {
 
                 workAllocator.updateWorkStatus(worker, workStatus);
 
-                workersAdapter.notifyItemChanged(i);
+                workingWorkersAdapter.notifyItemChanged(i);
                 break;
             }
         }
@@ -311,7 +322,7 @@ public class Master extends AppCompatActivity {
                     worker.setDistanceFromMaster(results[0]);
                 }
 
-                workersAdapter.notifyItemChanged(i);
+                workingWorkersAdapter.notifyItemChanged(i);
             }
         }
     }

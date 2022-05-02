@@ -16,10 +16,10 @@ import java.io.IOException;
 
 public class WorkerStatusSubscriber {
 
-    private Context context;
-    private String endpointId;
+    private final Context context;
+    private final String endpointId;
     private PayloadListener payloadListener;
-    private WorkerStatusListener workerStatusListener;
+    private final WorkerStatusListener workerStatusListener;
 
     public WorkerStatusSubscriber(Context context, String endpointId, WorkerStatusListener workerStatusListener) {
         this.context = context;

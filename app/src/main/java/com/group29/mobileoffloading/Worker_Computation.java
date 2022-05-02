@@ -23,7 +23,6 @@ import com.group29.mobileoffloading.DataModels.WorkData;
 import com.group29.mobileoffloading.DataModels.WorkInfo;
 import com.group29.mobileoffloading.utilities.Constants;
 import com.group29.mobileoffloading.utilities.DataTransfer;
-import com.group29.mobileoffloading.utilities.MatrixDS;
 import com.group29.mobileoffloading.utilities.PayloadConverter;
 
 import java.io.IOException;
@@ -169,7 +168,7 @@ public class Worker_Computation extends AppCompatActivity {
                 setStatusText("Work status: Computing", true);
 
                 WorkData workData = (WorkData) receivedPayload.getData();
-                int dotProduct = MatrixDS.getDotProduct(workData.getRows(), workData.getCols());
+                int dotProduct = calculateDotProduct(workData.getRows(), workData.getCols());
 
                 Log.d("WORKER_COMPUTATION", "Partition Index: " + workData.getPartitionIndex());
                 if (!finishedWork.contains(workData.getPartitionIndex())) {
@@ -206,6 +205,13 @@ public class Worker_Computation extends AppCompatActivity {
         }
     }
 
+    public int calculateDotProduct(int[] a, int[] b){
+        int product = 0;
+        for(int i = 0 ; i < a.length; i++){
+            product +=  (a[i] * b[i]);
+        }
+        return product;
+    }
 
 }
 

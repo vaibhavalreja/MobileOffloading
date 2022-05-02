@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_margin="15dp"
+    android:background="@drawable/customborder"
     android:orientation="vertical"
     tools:context=".Master_Discovery">
 
@@ -27,7 +28,7 @@
             android:layout_height="wrap_content"
             android:justificationMode="inter_word"
             android:text="Discovered Worker Nodes"
-            android:textSize="30sp"
+            android:textSize="25sp"
             android:textStyle="bold" />
 
         <TextView
@@ -39,6 +40,7 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_connected_devices"
+        android:background="@drawable/customborder"
         android:layout_width="match_parent"
         android:layout_height="400dp" />
 

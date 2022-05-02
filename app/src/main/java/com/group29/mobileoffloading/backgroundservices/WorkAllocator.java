@@ -6,14 +6,13 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.gms.nearby.connection.Payload;
-import com.group29.mobileoffloading.listeners.ComputationListener;
 import com.group29.mobileoffloading.DataModels.ClientPayLoad;
 import com.group29.mobileoffloading.DataModels.WorkData;
 import com.group29.mobileoffloading.DataModels.WorkInfo;
 import com.group29.mobileoffloading.DataModels.Worker;
+import com.group29.mobileoffloading.listeners.ComputationListener;
 import com.group29.mobileoffloading.utilities.Constants;
 import com.group29.mobileoffloading.utilities.FlushToFile;
-import com.group29.mobileoffloading.utilities.MatrixDS;
 import com.group29.mobileoffloading.utilities.PayloadConverter;
 
 import java.util.ArrayList;
@@ -24,28 +23,24 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 
 public class WorkAllocator {
-    private Context context;
-    private ArrayList<Worker> workers = new ArrayList<>();
-
-    private int[][] matrix1;
-    private int[][] matrix2;
-    private int[][] matrix2Transpose; //This is required for computation
-    private int rows1, cols1, rows2, cols2;
-
-    private int totalpartitions;
-
     private final Hashtable<Integer, Integer> partitionResults = new Hashtable<>();
-
-    private PriorityQueue<Worker> workerQueue;
-    private BlockingQueue<Integer> workQueue = new LinkedBlockingDeque<>();
-
+    private final Context context;
+    private final ArrayList<Worker> workers = new ArrayList<>();
+    private final int[][] matrix1;
+    private final int[][] matrix2;
+    private final int[][] matrix2Transpose; //This is required for computation
+    private final int rows1;
+    private final int cols1;
+    private final int rows2;
+    private final int cols2;
+    private final int totalpartitions;
+    private final PriorityQueue<Worker> workerQueue;
+    private final BlockingQueue<Integer> workQueue = new LinkedBlockingDeque<>();
+    private final ComputationListener workCallback;
     private boolean bye = false;
-
     private Handler handler;
     private Runnable runnable;
-
     private long beginTime;
-    private ComputationListener workCallback;
 
     public WorkAllocator(Context context, ArrayList<Worker> workers, int[][] matrix1, int[][] matrix2, ComputationListener uiCallback) {
         this.context = context;
@@ -54,7 +49,7 @@ public class WorkAllocator {
         this.matrix1 = matrix1;
         this.matrix2 = matrix2;
 
-        this.matrix2Transpose = MatrixDS.getTranspose(matrix2);
+        this.matrix2Transpose = calculateTranspose(matrix2);
 
         this.rows1 = matrix1.length;
         this.rows2 = matrix2.length;
@@ -67,22 +62,17 @@ public class WorkAllocator {
         this.workCallback = uiCallback;
     }
 
-    private class WorkerPriorityChecker implements Comparator<Worker> {
-        @Override
-        public int compare(Worker worker1, Worker worker2) {
+    public int[][] calculateTranspose(int[][] matrix) {
+        int num_rows = matrix.length;
+        int num_cols = matrix[0].length;
+        int[][] transpose = new int[num_cols][num_rows];
 
-            if ((worker1.getDeviceStats().getBatteryLevel() - worker2.getDeviceStats().getBatteryLevel()) > ThresholdsHolder.BATTERY_LEVEL_DIFFERENCE) {
-                return worker1.getDeviceStats().getBatteryLevel() - worker2.getDeviceStats().getBatteryLevel();
-            }
-
-            if (worker1.getDeviceStats().isCharging() && worker2.getDeviceStats().isCharging()) {
-                return worker1.getDeviceStats().getBatteryLevel() - worker2.getDeviceStats().getBatteryLevel();
-            } else if (worker1.getDeviceStats().isCharging()) {
-                return 1;
-            } else {
-                return -1;
+        for (int i = 0; i < num_rows; i++) {
+            for (int j = 0; j < num_cols; j++) {
+                transpose[j][i] = matrix[i][j];
             }
         }
+        return transpose;
     }
 
     public void beginDistributedComputation() {
@@ -95,13 +85,6 @@ public class WorkAllocator {
         startWorkAllocation(); //startWorkScheduler
 
     }
-/*
-    private void startWorkAllocation(){
-        for(int i = 0; i < workerQueue.size();i++){
-            allocateWork();
-        }
-    }
-*/
 
     private void startWorkAllocation() {
         handler = new Handler();
@@ -118,12 +101,12 @@ public class WorkAllocator {
         handler.postDelayed(runnable, 1000);
     }
 
+
     private void initiateWorkAssignment() {
         for (int i = 0; i < workerQueue.size(); i++) {
             allocateWork();
         }
     }
-
 
     public void allocateWork() {
         if (workerQueue.size() > 0 && workQueue.size() > 0 && partitionResults.size() != totalpartitions) {
@@ -211,7 +194,6 @@ public class WorkAllocator {
             sendByeToWorkers();
         }
     }
-
 
     public void updateWorkStatus(Worker worker, WorkInfo workInfo) {
         if (partitionResults.size() == totalpartitions) {
@@ -312,6 +294,24 @@ public class WorkAllocator {
 
         /* If battery level is below this */
         public final static int MINIMUM_BATTERY_LEVEL = 5;
+    }
+
+    private class WorkerPriorityChecker implements Comparator<Worker> {
+        @Override
+        public int compare(Worker worker1, Worker worker2) {
+
+            if ((worker1.getDeviceStats().getBatteryLevel() - worker2.getDeviceStats().getBatteryLevel()) > ThresholdsHolder.BATTERY_LEVEL_DIFFERENCE) {
+                return worker1.getDeviceStats().getBatteryLevel() - worker2.getDeviceStats().getBatteryLevel();
+            }
+
+            if (worker1.getDeviceStats().isCharging() && worker2.getDeviceStats().isCharging()) {
+                return worker1.getDeviceStats().getBatteryLevel() - worker2.getDeviceStats().getBatteryLevel();
+            } else if (worker1.getDeviceStats().isCharging()) {
+                return 1;
+            } else {
+                return -1;
+            }
+        }
     }
 
 

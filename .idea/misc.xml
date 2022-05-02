@@ -13,6 +13,7 @@
         <entry key="app/src/main/res/drawable/ic_work.xml" value="0.106" />
         <entry key="app/src/main/res/drawable/location_img_foreground.xml" value="0.186" />
         <entry key="app/src/main/res/drawable/stop_img_foreground.xml" value="0.186" />
+        <entry key="app/src/main/res/drawable/worker_border.xml" value="0.18" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.165" />
         <entry key="app/src/main/res/layout/activity_master.xml" value="0.25" />
         <entry key="app/src/main/res/layout/activity_master_discovery.xml" value="0.25" />

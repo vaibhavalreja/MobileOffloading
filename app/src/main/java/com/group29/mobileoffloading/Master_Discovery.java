@@ -26,27 +26,26 @@ import com.google.android.gms.nearby.connection.EndpointDiscoveryCallback;
 import com.google.android.gms.nearby.connection.Payload;
 import com.google.android.gms.nearby.connection.PayloadTransferUpdate;
 import com.google.android.gms.nearby.connection.Strategy;
-import com.group29.mobileoffloading.CustomListAdapters.ConnectedDevicesAdapter;
+import com.group29.mobileoffloading.CustomListAdapters.AvailableWorkersAdapter;
 import com.group29.mobileoffloading.backgroundservices.Connector;
 import com.group29.mobileoffloading.backgroundservices.NearbySingleton;
 import com.group29.mobileoffloading.backgroundservices.WorkAllocator;
 import com.group29.mobileoffloading.listeners.ClientConnectionListener;
 import com.group29.mobileoffloading.listeners.PayloadListener;
 import com.group29.mobileoffloading.DataModels.ClientPayLoad;
-import com.group29.mobileoffloading.DataModels.ConnectedDevice;
+import com.group29.mobileoffloading.DataModels.AvailableWorker;
 import com.group29.mobileoffloading.DataModels.DeviceInfo;
 import com.group29.mobileoffloading.utilities.Constants;
 import com.group29.mobileoffloading.utilities.PayloadConverter;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
 public class Master_Discovery extends AppCompatActivity {
 
-    private RecyclerView rvConnectedDevices;
-    private ConnectedDevicesAdapter connectedDevicesAdapter;
-    private List<ConnectedDevice> connectedDevices = new ArrayList<>();
+    private RecyclerView available_workers_rv;
+    private AvailableWorkersAdapter availableWorkersAdapter;
+    private ArrayList<AvailableWorker> availableWorkerDevices = new ArrayList<>();
     private ClientConnectionListener clientConnectionListener;
     private PayloadListener payloadListener;
     private DiscoveryOptions discoveryOptions;
@@ -77,13 +76,13 @@ public class Master_Discovery extends AppCompatActivity {
         masterNodeId = Settings.Secure.getString(getApplicationContext().getContentResolver(), Settings.Secure.ANDROID_ID);
         this.discoveryOptions = new DiscoveryOptions.Builder().setStrategy(Strategy.P2P_CLUSTER).build();
 
-        rvConnectedDevices = findViewById(R.id.rv_connected_devices);
-        connectedDevicesAdapter = new ConnectedDevicesAdapter(this, connectedDevices);
+        available_workers_rv = findViewById(R.id.rv_connected_devices);
+        availableWorkersAdapter = new AvailableWorkersAdapter(this, availableWorkerDevices);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());
-        rvConnectedDevices.setLayoutManager(linearLayoutManager);
+        available_workers_rv.setLayoutManager(linearLayoutManager);
 
-        rvConnectedDevices.setAdapter(connectedDevicesAdapter);
-        connectedDevicesAdapter.notifyDataSetChanged();
+        available_workers_rv.setAdapter(availableWorkersAdapter);
+        availableWorkersAdapter.notifyDataSetChanged();
 
         payloadListener = new PayloadListener() {
             @Override
@@ -144,7 +143,7 @@ public class Master_Discovery extends AppCompatActivity {
 
 
     public void assignTasks(View view) {
-        ArrayList<ConnectedDevice> readyDevices = getDevicesInReadyState();
+        ArrayList<AvailableWorker> readyDevices = getDevicesInReadyState();
         if (readyDevices.size() == 0) {
             Log.d("TEST","no devices");
             Toast.makeText(getApplicationContext(), "No worker Available at the moment", Toast.LENGTH_LONG).show();
@@ -157,24 +156,24 @@ public class Master_Discovery extends AppCompatActivity {
         }
     }
 
-    private ArrayList<ConnectedDevice> getDevicesInReadyState() {
-        ArrayList<ConnectedDevice> res = new ArrayList<>();
-        for (int i = 0; i < connectedDevices.size(); i++) {
-            if (connectedDevices.get(i).getRequestStatus().equals(Constants.RequestStatus.ACCEPTED)) {
-                if (connectedDevices.get(i).getDeviceStats().getBatteryLevel() > WorkAllocator.ThresholdsHolder.MINIMUM_BATTERY_LEVEL) {
-                    res.add(connectedDevices.get(i));
+    private ArrayList<AvailableWorker> getDevicesInReadyState() {
+        ArrayList<AvailableWorker> res = new ArrayList<>();
+        for (int i = 0; i < availableWorkerDevices.size(); i++) {
+            if (availableWorkerDevices.get(i).getRequestStatus().equals(Constants.RequestStatus.ACCEPTED)) {
+                if (availableWorkerDevices.get(i).getDeviceStats().getBatteryLevel() > WorkAllocator.ThresholdsHolder.MINIMUM_BATTERY_LEVEL) {
+                    res.add(availableWorkerDevices.get(i));
                 } else {
                     ClientPayLoad tPayload = new ClientPayLoad();
                     tPayload.setTag(Constants.PayloadTags.DISCONNECTED);
 
-                    Connector.sendToDevice(getApplicationContext(), connectedDevices.get(i).getEndpointId(), tPayload);
+                    Connector.sendToDevice(getApplicationContext(), availableWorkerDevices.get(i).getEndpointId(), tPayload);
                 }
             } else {
                 Log.d("MASTER_DISCOVERY", "LOOPING");
                 ClientPayLoad tPayload = new ClientPayLoad();
                 tPayload.setTag(Constants.PayloadTags.DISCONNECTED);
 
-                Connector.sendToDevice(getApplicationContext(), connectedDevices.get(i).getEndpointId(), tPayload);
+                Connector.sendToDevice(getApplicationContext(), availableWorkerDevices.get(i).getEndpointId(), tPayload);
             }
 
         }
@@ -182,11 +181,11 @@ public class Master_Discovery extends AppCompatActivity {
     }
 
     private void updateConnectedDeviceRequestStatus(String endpointId, String status) {
-        for (int i = 0; i < connectedDevices.size(); i++) {
-            if (connectedDevices.get(i).getEndpointId().equals(endpointId)) {
-                connectedDevices.get(i).setRequestStatus(status);
+        for (int i = 0; i < availableWorkerDevices.size(); i++) {
+            if (availableWorkerDevices.get(i).getEndpointId().equals(endpointId)) {
+                availableWorkerDevices.get(i).setRequestStatus(status);
                 Log.d("MASTER_DISCOVERY", "Status of end point set to "+status);
-                connectedDevicesAdapter.notifyItemChanged(i);
+                availableWorkersAdapter.notifyItemChanged(i);
                 break;
             }
         }
@@ -201,14 +200,14 @@ public class Master_Discovery extends AppCompatActivity {
                 Log.d("MASTER_DISCOVERY", endpointId);
                 Log.d("MASTER_DISCOVERY", discoveredEndpointInfo.getServiceId() + " " + discoveredEndpointInfo.getEndpointName());
 
-                ConnectedDevice connectedDevice = new ConnectedDevice();
-                connectedDevice.setEndpointId(endpointId);
-                connectedDevice.setEndpointName(discoveredEndpointInfo.getEndpointName());
-                connectedDevice.setRequestStatus(Constants.RequestStatus.PENDING);
-                connectedDevice.setDeviceStats(new DeviceInfo());
+                AvailableWorker availableWorker = new AvailableWorker();
+                availableWorker.setEndpointId(endpointId);
+                availableWorker.setEndpointName(discoveredEndpointInfo.getEndpointName());
+                availableWorker.setRequestStatus(Constants.RequestStatus.PENDING);
+                availableWorker.setDeviceStats(new DeviceInfo());
 
-                connectedDevices.add(connectedDevice);
-                connectedDevicesAdapter.notifyItemChanged(connectedDevices.size() - 1);
+                availableWorkerDevices.add(availableWorker);
+                availableWorkersAdapter.notifyItemChanged(availableWorkerDevices.size() - 1);
 
                 Log.d("MASTER_DISCOVERY", "Added end point to connected devices : " +endpointId);
 
@@ -251,12 +250,12 @@ public class Master_Discovery extends AppCompatActivity {
 
     private void removeConnectedDevice(String endpointId, boolean forceRemove) {
 
-        for (int i = 0; i < connectedDevices.size(); i++) {
-            boolean checkStatus = forceRemove ? true :  !connectedDevices.get(i).getRequestStatus().equals(Constants.RequestStatus.ACCEPTED);
-            if (connectedDevices.get(i).getEndpointId().equals(endpointId) && checkStatus) {
+        for (int i = 0; i < availableWorkerDevices.size(); i++) {
+            boolean checkStatus = forceRemove ? true :  !availableWorkerDevices.get(i).getRequestStatus().equals(Constants.RequestStatus.ACCEPTED);
+            if (availableWorkerDevices.get(i).getEndpointId().equals(endpointId) && checkStatus) {
                 Log.d("MASTER_DISCOVERY", "Removed end point from connected devices " + endpointId );
-                connectedDevices.remove(i);
-                connectedDevicesAdapter.notifyItemChanged(i);
+                availableWorkerDevices.remove(i);
+                availableWorkersAdapter.notifyItemChanged(i);
                 break;
             }
         }
@@ -264,12 +263,12 @@ public class Master_Discovery extends AppCompatActivity {
 
     private void updateDeviceStats(String endpointId, DeviceInfo deviceStats) {
         canAssign(deviceStats);
-        for (int i = 0; i < connectedDevices.size(); i++) {
-            if (connectedDevices.get(i).getEndpointId().equals(endpointId)) {
-                connectedDevices.get(i).setDeviceStats(deviceStats);
+        for (int i = 0; i < availableWorkerDevices.size(); i++) {
+            if (availableWorkerDevices.get(i).getEndpointId().equals(endpointId)) {
+                availableWorkerDevices.get(i).setDeviceStats(deviceStats);
 
-                connectedDevices.get(i).setRequestStatus(Constants.RequestStatus.ACCEPTED);
-                connectedDevicesAdapter.notifyItemChanged(i);
+                availableWorkerDevices.get(i).setRequestStatus(Constants.RequestStatus.ACCEPTED);
+                availableWorkersAdapter.notifyItemChanged(i);
                 break;
             }
         }
@@ -296,10 +295,10 @@ public class Master_Discovery extends AppCompatActivity {
         finish();
     }
 
-    private void startMasterActivity(ArrayList<ConnectedDevice> connectedDevices) {
+    private void startMasterActivity(ArrayList<AvailableWorker> availableWorkerDevices) {
         Intent intent = new Intent(getApplicationContext(), Master.class);
         Bundle bundle = new Bundle();
-        bundle.putSerializable(Constants.CONNECTED_DEVICES, connectedDevices);
+        bundle.putSerializable(Constants.CONNECTED_DEVICES, availableWorkerDevices);
         intent.putExtras(bundle);
         Log.d("TEST","STARTM");
         startActivity(intent);
