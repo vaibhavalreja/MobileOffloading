@@ -162,9 +162,9 @@ public class WorkAllocator {
         this.workers.addAll(workers);
     }
 
-    public void removeWorker(String endpointId) {
+    public void removeWorker(String nodeIdString) {
         for (int i = 0; i < workers.size(); i++) {
-            if (workers.get(i).getEndpointId().equals(endpointId)) {
+            if (workers.get(i).getEndpointId().equals(nodeIdString)) {
                 workers.remove(i);
                 break;
             }

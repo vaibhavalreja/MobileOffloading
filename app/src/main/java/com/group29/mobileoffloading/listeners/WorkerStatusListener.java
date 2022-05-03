@@ -5,8 +5,8 @@ import com.group29.mobileoffloading.DataModels.WorkInfo;
 
 public interface WorkerStatusListener {
 
-    void onWorkStatusReceived(String endpointId, WorkInfo workInfo);
+    void onWorkStatusReceived(String nodeIdString, WorkInfo workInfo);
 
-    void onDeviceStatsReceived(String endpointId, DeviceInfo deviceStats);
+    void onDeviceStatsReceived(String nodeIdString, DeviceInfo deviceStats);
 
 }

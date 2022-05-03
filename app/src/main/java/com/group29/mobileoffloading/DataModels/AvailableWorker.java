@@ -3,18 +3,18 @@ package com.group29.mobileoffloading.DataModels;
 import java.io.Serializable;
 
 public class AvailableWorker implements Serializable {
-    private String endpointId;
+    private String nodeIdString;
     private String endpointName;
     private DeviceInfo deviceInfo;
     private String requestStatus;
 
 
     public String getEndpointId() {
-        return endpointId;
+        return nodeIdString;
     }
 
-    public void setEndpointId(String endpointId) {
-        this.endpointId = endpointId;
+    public void setEndpointId(String nodeIdString) {
+        this.nodeIdString = nodeIdString;
     }
 
     public String getEndpointName() {

@@ -86,12 +86,12 @@ public class Worker_Computation extends AppCompatActivity {
     private void connectToMaster() {
         payloadCallback = new PayloadListener() {
             @Override
-            public void onPayloadReceived(@NonNull String endpointId, @NonNull Payload payload) {
+            public void onPayloadReceived(@NonNull String nodeIdString, @NonNull Payload payload) {
                 startWorking(payload);
             }
 
             @Override
-            public void onPayloadTransferUpdate(@NonNull String endpointId, @NonNull PayloadTransferUpdate payloadTransferUpdate) {
+            public void onPayloadTransferUpdate(@NonNull String nodeIdString, @NonNull PayloadTransferUpdate payloadTransferUpdate) {
 
             }
         };

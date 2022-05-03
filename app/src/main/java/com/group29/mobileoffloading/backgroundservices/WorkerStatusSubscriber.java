@@ -17,31 +17,31 @@ import java.io.IOException;
 public class WorkerStatusSubscriber {
 
     private final Context context;
-    private final String endpointId;
+    private final String nodeIdString;
     private PayloadListener payloadListener;
     private final WorkerStatusListener workerStatusListener;
 
-    public WorkerStatusSubscriber(Context context, String endpointId, WorkerStatusListener workerStatusListener) {
+    public WorkerStatusSubscriber(Context context, String nodeIdString, WorkerStatusListener workerStatusListener) {
         this.context = context;
-        this.endpointId = endpointId;
+        this.nodeIdString = nodeIdString;
         this.workerStatusListener = workerStatusListener;
     }
 
     public void start() {
         payloadListener = new PayloadListener() {
             @Override
-            public void onPayloadReceived(String endpointId, Payload payload) {
+            public void onPayloadReceived(String nodeIdString, Payload payload) {
                 try {
                     ClientPayLoad tPayload = (ClientPayLoad) PayloadConverter.fromPayload(payload);
                     String payloadTag = tPayload.getTag();
 
                     if (payloadTag.equals(Constants.PayloadTags.WORK_STATUS)) {
                         if (workerStatusListener != null) {
-                            workerStatusListener.onWorkStatusReceived(endpointId, (WorkInfo) tPayload.getData());
+                            workerStatusListener.onWorkStatusReceived(nodeIdString, (WorkInfo) tPayload.getData());
                         }
                     } else if (payloadTag.equals(Constants.PayloadTags.DEVICE_STATS)) {
                         if (workerStatusListener != null) {
-                            workerStatusListener.onDeviceStatsReceived(endpointId, (DeviceInfo) tPayload.getData());
+                            workerStatusListener.onDeviceStatsReceived(nodeIdString, (DeviceInfo) tPayload.getData());
                         }
                     }
                 } catch (IOException | ClassNotFoundException e) {
@@ -50,13 +50,13 @@ public class WorkerStatusSubscriber {
             }
 
             @Override
-            public void onPayloadTransferUpdate(String endpointId, PayloadTransferUpdate payloadTransferUpdate) {
+            public void onPayloadTransferUpdate(String nodeIdString, PayloadTransferUpdate payloadTransferUpdate) {
 
             }
         };
 
         NearbySingleton.getInstance(context).registerPayloadListener(payloadListener);
-        NearbySingleton.getInstance(context).acceptConnection(endpointId);
+        NearbySingleton.getInstance(context).acceptConnection(nodeIdString);
     }
 
     public void stop() {

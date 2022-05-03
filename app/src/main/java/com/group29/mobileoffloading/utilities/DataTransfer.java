@@ -9,10 +9,10 @@ import com.group29.mobileoffloading.DataModels.ClientPayLoad;
 import java.io.IOException;
 
 public class DataTransfer {
-    public static void sendPayload(Context context, String endpointId, ClientPayLoad tPayload) {
+    public static void sendPayload(Context context, String nodeIdString, ClientPayLoad tPayload) {
         try {
             Payload payload = PayloadConverter.toPayload(tPayload);
-            Nearby.getConnectionsClient(context).sendPayload(endpointId, payload);
+            Nearby.getConnectionsClient(context).sendPayload(nodeIdString, payload);
         } catch (IOException e) {
             e.printStackTrace();
         }

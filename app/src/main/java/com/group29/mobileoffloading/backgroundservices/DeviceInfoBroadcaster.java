@@ -17,14 +17,14 @@ import com.group29.mobileoffloading.utilities.DataTransfer;
 public class DeviceInfoBroadcaster {
 
     private Context context;
-    private String endpointId;
+    private String nodeIdString;
     private Handler handler;
     private Runnable runnable;
     private int interval;
 
-    public DeviceInfoBroadcaster(Context context, String endpointId, int updateInterval) {
+    public DeviceInfoBroadcaster(Context context, String nodeIdString, int updateInterval) {
         this.context = context;
-        this.endpointId = endpointId;
+        this.nodeIdString = nodeIdString;
         this.interval = updateInterval;
         handler = new Handler(Looper.getMainLooper());
         runnable = () -> {
@@ -44,18 +44,18 @@ public class DeviceInfoBroadcaster {
     }
 
     private void publish() {
-        DeviceInfoBroadcaster.publish(this.context, this.endpointId);
+        DeviceInfoBroadcaster.publish(this.context, this.nodeIdString);
     }
 
-    public static void publish(Context context, String endpointId) {
+    public static void publish(Context context, String nodeIdString) {
         // Get Device Statistics
         DeviceInfo deviceInfo = new DeviceInfo();
         deviceInfo.setBatteryLevel(getBatteryLevel(context));
         deviceInfo.setCharging(isPluggedIn(context));
         deviceInfo.setLocation(getLocation(context));
-        if(endpointId != null) {
+        if(nodeIdString != null) {
             ClientPayLoad payload = new ClientPayLoad().setTag(Constants.PayloadTags.DEVICE_STATS).setData(deviceInfo);
-            DataTransfer.sendPayload(context, endpointId, payload);
+            DataTransfer.sendPayload(context, nodeIdString, payload);
         }
         Log.d("DEVICE_STATS", "DEVICE STATUS B: " + deviceInfo.getBatteryLevel() + " P: " + deviceInfo.isCharging() +  " L: " + deviceInfo.getLatitude() + " " + deviceInfo.getLongitude());
     }

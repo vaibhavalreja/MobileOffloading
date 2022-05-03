@@ -34,10 +34,10 @@ public class NearbySingleton {
         this.context = context;
         this.connectionLifecycleCallback = new ConnectionLifecycleCallback() {
             @Override
-            public void onConnectionInitiated(@NonNull String endpointId, @NonNull ConnectionInfo connectionInfo) {
+            public void onConnectionInitiated(@NonNull String nodeIdString, @NonNull ConnectionInfo connectionInfo) {
                 for (ClientConnectionListener clientConnectionListener : clientConnectionListenerSet) {
                     try {
-                        clientConnectionListener.onConnectionInitiated(endpointId, connectionInfo);
+                        clientConnectionListener.onConnectionInitiated(nodeIdString, connectionInfo);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -45,10 +45,10 @@ public class NearbySingleton {
             }
 
             @Override
-            public void onConnectionResult(@NonNull String endpointId, @NonNull ConnectionResolution connectionResolution) {
+            public void onConnectionResult(@NonNull String nodeIdString, @NonNull ConnectionResolution connectionResolution) {
                 for (ClientConnectionListener clientConnectionListener : clientConnectionListenerSet) {
                     try {
-                        clientConnectionListener.onConnectionResult(endpointId, connectionResolution);
+                        clientConnectionListener.onConnectionResult(nodeIdString, connectionResolution);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -56,11 +56,11 @@ public class NearbySingleton {
             }
 
             @Override
-            public void onDisconnected(@NonNull String endpointId) {
+            public void onDisconnected(@NonNull String nodeIdString) {
                 Toast.makeText(context, "Disconnected", Toast.LENGTH_SHORT).show();
                 for (ClientConnectionListener clientConnectionListener : clientConnectionListenerSet) {
                     try {
-                        clientConnectionListener.onDisconnected(endpointId);
+                        clientConnectionListener.onDisconnected(nodeIdString);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -77,9 +77,9 @@ public class NearbySingleton {
         return nearbySingleton;
     }
 
-    public void requestConnection(String endpointId, String clientId) {
+    public void requestConnection(String nodeIdString, String clientId) {
         Nearby.getConnectionsClient(context)
-                .requestConnection(clientId, endpointId, connectionLifecycleCallback)
+                .requestConnection(clientId, nodeIdString, connectionLifecycleCallback)
                 .addOnSuccessListener(unused -> {
                     Log.d("NEARBYCONNCTNMGR", "CONNECTION REQUESTED");
                 })
@@ -89,13 +89,13 @@ public class NearbySingleton {
                 });
     }
 
-    public void acceptConnection(String endpointId) {
-        Nearby.getConnectionsClient(context).acceptConnection(endpointId, new PayloadCallback() {
+    public void acceptConnection(String nodeIdString) {
+        Nearby.getConnectionsClient(context).acceptConnection(nodeIdString, new PayloadCallback() {
             @Override
-            public void onPayloadReceived(@NonNull String endpointId, @NonNull Payload payload) {
+            public void onPayloadReceived(@NonNull String nodeIdString, @NonNull Payload payload) {
                 for (PayloadListener payloadListener : payloadListenersSet) {
                     try {
-                        payloadListener.onPayloadReceived(endpointId, payload);
+                        payloadListener.onPayloadReceived(nodeIdString, payload);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -103,18 +103,18 @@ public class NearbySingleton {
             }
 
             @Override
-            public void onPayloadTransferUpdate(@NonNull String endpointId, @NonNull PayloadTransferUpdate payloadTransferUpdate) {
+            public void onPayloadTransferUpdate(@NonNull String nodeIdString, @NonNull PayloadTransferUpdate payloadTransferUpdate) {
 
             }
         });
     }
 
-    public void rejectConnection(String endpointId) {
-        Nearby.getConnectionsClient(context).rejectConnection(endpointId);
+    public void rejectConnection(String nodeIdString) {
+        Nearby.getConnectionsClient(context).rejectConnection(nodeIdString);
     }
 
-    public void disconnectFromEndpoint(String endpointId) {
-        Nearby.getConnectionsClient(context).disconnectFromEndpoint(endpointId);
+    public void disconnectFromEndpoint(String nodeIdString) {
+        Nearby.getConnectionsClient(context).disconnectFromEndpoint(nodeIdString);
     }
 
     public Task<Void> advertise(String clientId, AdvertisingOptions advertisingOptions) {

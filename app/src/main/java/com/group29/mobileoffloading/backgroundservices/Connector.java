@@ -10,16 +10,16 @@ import com.group29.mobileoffloading.utilities.PayloadConverter;
 import java.io.IOException;
 
 public class Connector {
-    public static void sendToDevice(Context context, String endpointId, ClientPayLoad tPayload) {
+    public static void sendToDevice(Context context, String nodeIdString, ClientPayLoad tPayload) {
         try {
             Payload payload = PayloadConverter.toPayload(tPayload);
-            Connector.sendToDevice(context, endpointId, payload);
+            Connector.sendToDevice(context, nodeIdString, payload);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public static void sendToDevice(Context context, String endpointId, Payload payload) {
-        Nearby.getConnectionsClient(context).sendPayload(endpointId, payload);
+    public static void sendToDevice(Context context, String nodeIdString, Payload payload) {
+        Nearby.getConnectionsClient(context).sendPayload(nodeIdString, payload);
     }
 }

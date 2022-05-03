@@ -4,9 +4,9 @@ import com.google.android.gms.nearby.connection.ConnectionInfo;
 import com.google.android.gms.nearby.connection.ConnectionResolution;
 
 public interface ClientConnectionListener {
-    void onConnectionInitiated(String endpointId, ConnectionInfo connectionInfo);
+    void onConnectionInitiated(String nodeIdString, ConnectionInfo connectionInfo);
 
-    void onConnectionResult(String endpointId, ConnectionResolution connectionResolution);
+    void onConnectionResult(String nodeIdString, ConnectionResolution connectionResolution);
 
-    void onDisconnected(String endpointId);
+    void onDisconnected(String nodeIdString);
 }

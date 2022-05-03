@@ -222,12 +222,12 @@ public class Master extends AppCompatActivity {
     }
 
 
-    private void updateWorkerConnectionStatus(String endpointId, String status) {
-        Log.d("DISCONNECTED----", endpointId);
+    private void updateWorkerConnectionStatus(String nodeIdString, String status) {
+        Log.d("DISCONNECTED----", nodeIdString);
         for (int i = 0; i < workers.size(); i++) {
 
             Log.d("DISCONNECTED--", workers.get(i).getEndpointId());
-            if (workers.get(i).getEndpointId().equals(endpointId)) {
+            if (workers.get(i).getEndpointId().equals(nodeIdString)) {
                 workers.get(i).getWorkStatus().setStatusInfo(status);
                 workingWorkersAdapter.notifyDataSetChanged();
                 break;
@@ -244,27 +244,27 @@ public class Master extends AppCompatActivity {
 
             WorkerStatusSubscriber workerStatusSubscriber = new WorkerStatusSubscriber(getApplicationContext(), worker.getEndpointId(), new WorkerStatusListener() {
                 @Override
-                public void onWorkStatusReceived(String endpointId, WorkInfo workStatus) {
+                public void onWorkStatusReceived(String nodeIdString, WorkInfo workStatus) {
 
                     if (workStatus.getStatusInfo().equals(Constants.WorkStatus.DISCONNECTED)) {
-                        updateWorkerConnectionStatus(endpointId, Constants.WorkStatus.DISCONNECTED);
-                        workAllocator.removeWorker(endpointId);
-                        NearbySingleton.getInstance(getApplicationContext()).rejectConnection(endpointId);
+                        updateWorkerConnectionStatus(nodeIdString, Constants.WorkStatus.DISCONNECTED);
+                        workAllocator.removeWorker(nodeIdString);
+                        NearbySingleton.getInstance(getApplicationContext()).rejectConnection(nodeIdString);
                     } else {
-                        updateWorkerStatus(endpointId, workStatus);
+                        updateWorkerStatus(nodeIdString, workStatus);
                     }
                     workAllocator.checkWorkCompletion(getWorkAmount());
                 }
 
                 @Override
-                public void onDeviceStatsReceived(String endpointId, DeviceInfo deviceStats) {
-                    updateWorkerStatus(endpointId, deviceStats);
+                public void onDeviceStatsReceived(String nodeIdString, DeviceInfo deviceStats) {
+                    updateWorkerStatus(nodeIdString, deviceStats);
 
                     String deviceStatsStr = deviceStats.getBatteryLevel() + "%"
                             + "\t" + (deviceStats.isCharging() ? "CHARGING" : "NOT CHARGING")
                             + "\t\t" + deviceStats.getLatitude()
                             + "\t" + deviceStats.getLongitude();
-                    FlushToFile.writeTextToFile(getApplicationContext(), endpointId + ".txt", true, deviceStatsStr);
+                    FlushToFile.writeTextToFile(getApplicationContext(), nodeIdString + ".txt", true, deviceStatsStr);
                     Log.d("MASTER_ACTIVITY", "WORK AMOUNT: " + getWorkAmount());
                     workAllocator.checkWorkCompletion(getWorkAmount());
                 }
@@ -285,11 +285,11 @@ public class Master extends AppCompatActivity {
         return sum;
     }
 
-    private void updateWorkerStatus(String endpointId, WorkInfo workStatus) {
+    private void updateWorkerStatus(String nodeIdString, WorkInfo workStatus) {
         for (int i = 0; i < workers.size(); i++) {
             Worker worker = workers.get(i);
 
-            if (worker.getEndpointId().equals(endpointId)) {
+            if (worker.getEndpointId().equals(nodeIdString)) {
                 worker.setWorkStatus(workStatus);
 
                 if (workStatus.getStatusInfo().equals(Constants.WorkStatus.WORKING) && workAllocator.isItNewWork(workStatus.getPartitionIndexInfo())) {
@@ -306,11 +306,11 @@ public class Master extends AppCompatActivity {
 
     }
 
-    private void updateWorkerStatus(String endpointId, DeviceInfo deviceStats) {
+    private void updateWorkerStatus(String nodeIdString, DeviceInfo deviceStats) {
         for (int i = 0; i < workers.size(); i++) {
             Worker worker = workers.get(i);
 
-            if (worker.getEndpointId().equals(endpointId)) {
+            if (worker.getEndpointId().equals(nodeIdString)) {
                 worker.setDeviceStats(deviceStats);
                 Location masterLocation = DeviceInfoBroadcaster.getLocation(this);
                 if (deviceStats.isLocationValid() && masterLocation != null) {

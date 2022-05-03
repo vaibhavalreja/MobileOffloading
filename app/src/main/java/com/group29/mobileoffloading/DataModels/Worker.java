@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 public class Worker implements Serializable {
 
-    private String endpointId, endpointName;
+    private String nodeIdString, endpointName;
     private DeviceInfo deviceInfo;
     private WorkInfo workInfo;
 
@@ -12,11 +12,11 @@ public class Worker implements Serializable {
     private float distanceFromMaster;
 
     public String getEndpointId() {
-        return endpointId;
+        return nodeIdString;
     }
 
-    public void setEndpointId(String endpointId) {
-        this.endpointId = endpointId;
+    public void setEndpointId(String nodeIdString) {
+        this.nodeIdString = nodeIdString;
     }
 
     public String getEndpointName() {
