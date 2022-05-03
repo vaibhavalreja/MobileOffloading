@@ -13,7 +13,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.group29.mobileoffloading.DataModels.Worker;
 import com.group29.mobileoffloading.R;
-import com.group29.mobileoffloading.utilities.Constants;
 
 import java.util.List;
 
@@ -30,7 +29,7 @@ public class WorkingWorkersAdapter extends RecyclerView.Adapter<WorkingWorkersAd
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View list_item = layoutInflater.inflate(R.layout.item_worker, parent, false);
+        View list_item = layoutInflater.inflate(R.layout.worker_list_item, parent, false);
 
         return new ViewHolder(list_item);
     }
@@ -64,12 +63,12 @@ public class WorkingWorkersAdapter extends RecyclerView.Adapter<WorkingWorkersAd
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            worked_id_tv = itemView.findViewById(R.id.tv_client_id);
-            worker_state_tv = itemView.findViewById(R.id.tv_work_status);
-            battery_percentage_tv = itemView.findViewById(R.id.tv_battery_level);
-            is_charging_tv = itemView.findViewById(R.id.workerBatteryState);
-            work_done_tv = itemView.findViewById(R.id.tv_work_finished);
-            distance_tv = itemView.findViewById(R.id.tv_location);
+            worked_id_tv = itemView.findViewById(R.id.working_worker_id_tv);
+            worker_state_tv = itemView.findViewById(R.id.working_worker_state_tv);
+            battery_percentage_tv = itemView.findViewById(R.id.working_worker_battery_level_tv);
+            is_charging_tv = itemView.findViewById(R.id.working_worker_charging_state_tv);
+            work_done_tv = itemView.findViewById(R.id.working_worker_work_done_tv);
+            distance_tv = itemView.findViewById(R.id.working_worker_location_tv);
         }
     }
 }

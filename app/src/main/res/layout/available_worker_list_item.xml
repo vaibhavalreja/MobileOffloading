@@ -18,7 +18,7 @@
             android:text="Worker ID: " />
 
         <TextView
-            android:id="@+id/client_id"
+            android:id="@+id/available_worker_id_tv"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="5dp"
@@ -37,7 +37,7 @@
             android:text="Connection State: " />
 
         <TextView
-            android:id="@+id/connection_request_state"
+            android:id="@+id/available_worker_connection_state_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp"
@@ -56,7 +56,7 @@
             android:text="Battery: " />
 
         <TextView
-            android:id="@+id/battery_level"
+            android:id="@+id/available_worker_battery_percentage_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="unknown" />

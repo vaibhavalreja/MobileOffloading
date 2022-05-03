@@ -4,101 +4,33 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_gravity="center_vertical|center_horizontal"
-    android:background="@drawable/customborder"
     android:orientation="vertical"
-    android:padding="15dp"
-    tools:context=".WorkerBroadcastingActivity">
+    android:background="@drawable/customborder"
+    tools:context=".WorkerActivity">
 
     <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical|center_horizontal"
-        android:text="Role: Worker"
-        android:textSize="35sp"
-        android:textStyle="bold|italic" />
-
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:text="State"
-            android:textSize="24sp"
-            android:textStyle="bold|italic" />
-
-        <TextView
-            android:id="@+id/statusText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="5dp"
-            android:text="null"
-            android:textSize="20sp" />
-    </LinearLayout>
-
-    <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
-
-        <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/battery_img_foreground" />
-
-        <LinearLayout
-            android:layout_gravity="center"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/percentage"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Level: Measuring">
-
-            </TextView>
-
-            <TextView
-                android:id="@+id/plugged"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Plugged In: Checking" />
-        </LinearLayout>
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:text="Role: Worker"
+        android:textSize="30sp" />
 
-        <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/location_img_foreground" />
+    <TextView
+        android:id="@+id/worker_state_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Work status: Waiting" />
 
-        <LinearLayout
-            android:layout_gravity="center"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
+    <TextView
+        android:id="@+id/worker_power_consumed_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Power consumed: Unknown" />
 
-            <TextView
-                android:id="@+id/latitude"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Lattitude: Calculating" />
-
-            <TextView
-                android:id="@+id/longitude"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Longitude: Calculating" />
-        </LinearLayout>
-    </LinearLayout>
-
+    <ImageButton
+        android:id="@+id/worker_stop_working_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/stop_img_foreground" />
 </LinearLayout>
+
+

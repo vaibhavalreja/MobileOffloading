@@ -20,7 +20,7 @@
             android:text="Worker ID: " />
 
         <TextView
-            android:id="@+id/tv_client_id"
+            android:id="@+id/working_worker_id_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
     </LinearLayout>
@@ -38,7 +38,7 @@
             android:text="Battery: " />
 
         <TextView
-            android:id="@+id/tv_battery_level"
+            android:id="@+id/working_worker_battery_level_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
     </LinearLayout>
@@ -56,7 +56,7 @@
             android:text="Worker State:" />
 
         <TextView
-            android:id="@+id/tv_work_status"
+            android:id="@+id/working_worker_state_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
     </LinearLayout>
@@ -74,7 +74,7 @@
             android:text="Work Completed: " />
 
         <TextView
-            android:id="@+id/tv_work_finished"
+            android:id="@+id/working_worker_work_done_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
     </LinearLayout>
@@ -92,7 +92,7 @@
             android:text="Distance from master node(approx):" />
 
         <TextView
-            android:id="@+id/tv_location"
+            android:id="@+id/working_worker_location_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
     </LinearLayout>
@@ -110,7 +110,7 @@
             android:text="Charging :" />
 
         <TextView
-            android:id="@+id/workerBatteryState"
+            android:id="@+id/working_worker_charging_state_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
     </LinearLayout>

@@ -47,7 +47,7 @@
         android:textStyle="bold|italic" />
 
     <TextView
-        android:id="@+id/masterTime"
+        android:id="@+id/master_execution_time_tv"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Execution time for Master Node:"
@@ -55,7 +55,7 @@
         android:textStyle="bold" />
 
     <TextView
-        android:id="@+id/worker_execution_time"
+        android:id="@+id/worker_execution_time_tv"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Execution time for Worker Nodes:"

@@ -23,7 +23,6 @@
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/statusText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:justificationMode="inter_word"
@@ -31,11 +30,6 @@
             android:textSize="25sp"
             android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/desc"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingTop="5dp" />
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
@@ -58,7 +52,7 @@
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/discovery"
+            android:id="@+id/master_search_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
@@ -69,10 +63,9 @@
 
     <Button
         android:enabled="false"
-        android:id="@+id/assignTask"
+        android:id="@+id/master_distribute_task_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical|center_horizontal"
-        android:onClick="assignTasks"
         android:text="Distribute Work"/>
 </LinearLayout>

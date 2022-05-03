@@ -15,14 +15,14 @@ import com.group29.mobileoffloading.utilities.PayloadConverter;
 
 import java.io.IOException;
 
-public class WorkerStatusSubscriber {
+public class WorkerListener {
 
     private final Context context;
     private final String nodeIdString;
     private PayloadListener payloadListener;
     private final WorkerStatusListener workerStatusListener;
 
-    public WorkerStatusSubscriber(Context context, String nodeIdString, WorkerStatusListener workerStatusListener) {
+    public WorkerListener(Context context, String nodeIdString, WorkerStatusListener workerStatusListener) {
         this.context = context;
         this.nodeIdString = nodeIdString;
         this.workerStatusListener = workerStatusListener;

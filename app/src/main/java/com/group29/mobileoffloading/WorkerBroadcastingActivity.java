@@ -24,6 +24,8 @@ import com.group29.mobileoffloading.Helpers.NearbySingleton;
 import com.group29.mobileoffloading.listeners.ClientConnectionListener;
 import com.group29.mobileoffloading.utilities.Constants;
 
+import org.w3c.dom.Text;
+
 public class WorkerBroadcastingActivity extends AppCompatActivity {
     private String workerId;
     private String masterId = "";
@@ -37,7 +39,7 @@ public class WorkerBroadcastingActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_worker);
+        setContentView(R.layout.activity_worker_broadcasting);
         this.advertisingOptions = new AdvertisingOptions.Builder().setStrategy(Strategy.P2P_CLUSTER).build();
         workerId = Settings.Secure.getString(getApplicationContext().getContentResolver(), Settings.Secure.ANDROID_ID);
         setDeviceId("Device ID: " + workerId);
@@ -73,7 +75,7 @@ public class WorkerBroadcastingActivity extends AppCompatActivity {
     }
 
     void setState(String text) {
-        ((TextView) findViewById(R.id.statusText)).setText(text);
+        ((TextView) findViewById(R.id.worker_broadcasting_state_tv)).setText(text);
     }
 
     void setDeviceId(String text) {
@@ -81,19 +83,17 @@ public class WorkerBroadcastingActivity extends AppCompatActivity {
     }
 
     void refreshCardData() {
-        TextView st = findViewById(R.id.percentage);
+        TextView st = findViewById(R.id.worker_broadcasting_battery_percentage_tv);
         st.setText("Level: " + DeviceInfoBroadcaster.getBatteryLevel(this) + "%");
-        ((TextView)findViewById(R.id.plugged)).setText(String.format("Plugged In: %s", DeviceInfoBroadcaster.isPluggedIn(this) ? "true" : "false"));
+        ((TextView)findViewById(R.id.worker_broadcasting_charging_tv)).setText(String.format("Plugged In: %s", DeviceInfoBroadcaster.isPluggedIn(this) ? "true" : "false"));
+        TextView latitude_tv = findViewById(R.id.worker_broadcasting_latitude_tv);
+        TextView longitude_tv = findViewById(R.id.worker_broadcasting_longitude_tv);
         if (DeviceInfoBroadcaster.getLocation(this) != null) {
-            TextView la = findViewById(R.id.latitude);
-            la.setText(String.format("Latitude: %s", DeviceInfoBroadcaster.getLocation(this).getLatitude()));
-            TextView lo = findViewById(R.id.longitude);
-            lo.setText("Longitude: " + DeviceInfoBroadcaster.getLocation(this).getLongitude());
+            latitude_tv.setText(String.format("Latitude: %s", DeviceInfoBroadcaster.getLocation(this).getLatitude()));
+            longitude_tv.setText("Longitude: " + DeviceInfoBroadcaster.getLocation(this).getLongitude());
         } else {
-            TextView la = findViewById(R.id.latitude);
-            la.setText("Latitude: Not Available");
-            TextView lo = findViewById(R.id.longitude);
-            lo.setText("Longitude: Not Available");
+            latitude_tv.setText("Latitude: null");
+            longitude_tv.setText("Longitude: null");
         }
     }
 

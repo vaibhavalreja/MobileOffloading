@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.group29.mobileoffloading.R;
 import com.group29.mobileoffloading.DataModels.AvailableWorker;
-import com.group29.mobileoffloading.utilities.Constants;
 
 import java.util.ArrayList;
 
@@ -54,9 +53,9 @@ public class AvailableWorkersAdapter extends RecyclerView.Adapter<AvailableWorke
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            available_worker_id_tv = itemView.findViewById(R.id.client_id);
-            battery_percentage_tv = itemView.findViewById(R.id.battery_level);
-            worker_connection_state_tv = itemView.findViewById(R.id.connection_request_state);
+            available_worker_id_tv = itemView.findViewById(R.id.available_worker_id_tv);
+            battery_percentage_tv = itemView.findViewById(R.id.available_worker_battery_percentage_tv);
+            worker_connection_state_tv = itemView.findViewById(R.id.available_worker_connection_state_tv);
         }
     }
 }

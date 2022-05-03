@@ -5,6 +5,8 @@ import android.os.BatteryManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -13,7 +15,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.gms.nearby.connection.ConnectionInfo;
 import com.google.android.gms.nearby.connection.ConnectionResolution;
 import com.google.android.gms.nearby.connection.Payload;
-import com.google.android.gms.nearby.connection.PayloadTransferUpdate;
 import com.group29.mobileoffloading.BackgroundLoopers.DeviceInfoBroadcaster;
 import com.group29.mobileoffloading.Helpers.NearbySingleton;
 import com.group29.mobileoffloading.listeners.ClientConnectionListener;
@@ -41,30 +42,40 @@ public class WorkerActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_worker_computation);
+        setContentView(R.layout.activity_worker);
+        ((ImageButton) findViewById(R.id.worker_stop_working_button)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                WorkInfo workStatus = new WorkInfo();
+                workStatus.setPartitionIndexInfo(currentPartitionIndex);
+                workStatus.setStatusInfo(Constants.WorkStatus.DISCONNECTED);
+
+                ClientPayLoad tPayload1 = new ClientPayLoad();
+                tPayload1.setTag(Constants.PayloadTags.WORK_STATUS);
+                tPayload1.setData(workStatus);
+
+                DataTransfer.sendPayload(getApplicationContext(), masterId, tPayload1);
+                navBack();
+            }
+        });
         extractBundle();
         startDeviceStatsPublisher();
         setConnectionCallback();
         connectToMaster();
-        //start measuring the pwer consumption at WorkerBroadcastingActivity
+
         mBatteryManager = (BatteryManager)getSystemService(Context.BATTERY_SERVICE);
         initialEnergyWorker =
                 mBatteryManager.getLongProperty(BatteryManager.BATTERY_PROPERTY_ENERGY_COUNTER);
         Log.d("WORKER_COMPUTATION", "Capturing power consumption");
     }
 
-    public void setStatusText(String text, boolean isWorking) {
-        //UI Textview
-        TextView statusText = findViewById(R.id.statusText);
-        statusText.setText(text);
+    public void setStatusText(String text) {
+        ((TextView)findViewById(R.id.worker_state_tv)).setText(text);
     }
 
     public void onWorkFinished(String text) {
-        //UI Textview
-        TextView statusText = findViewById(R.id.statusText);
-        statusText.setText(text);
-        TextView powerConsumed = findViewById(R.id.powerValue);
-        powerConsumed.setText("Power Consumed : "  + Long.toString(energyConsumedWorker)+ " nWh");
+        ((TextView)findViewById(R.id.worker_state_tv)).setText(text);
+        ((TextView) findViewById(R.id.worker_power_consumed_tv)).setText("Power Consumed : "  + Long.toString(energyConsumedWorker)+ " nWh");
     }
 
     private void extractBundle() {
@@ -131,20 +142,6 @@ public class WorkerActivity extends AppCompatActivity {
         currentPartitionIndex = 0;
     }
 
-
-    public void onDisconnect(View view) {
-        WorkInfo workStatus = new WorkInfo();
-        workStatus.setPartitionIndexInfo(currentPartitionIndex);
-        workStatus.setStatusInfo(Constants.WorkStatus.DISCONNECTED);
-
-        ClientPayLoad tPayload1 = new ClientPayLoad();
-        tPayload1.setTag(Constants.PayloadTags.WORK_STATUS);
-        tPayload1.setData(workStatus);
-
-        DataTransfer.sendPayload(getApplicationContext(), masterId, tPayload1);
-        navBack();
-    }
-
     public void startWorking(Payload payload) {
         WorkInfo workStatus = new WorkInfo();
         ClientPayLoad sendPayload = new ClientPayLoad();
@@ -153,7 +150,7 @@ public class WorkerActivity extends AppCompatActivity {
         try {
             ClientPayLoad receivedPayload = PayloadConverter.fromPayload(payload);
             if (receivedPayload.getTag().equals(Constants.PayloadTags.WORK_DATA)) {
-                setStatusText("Work status: Computing", true);
+                setStatusText("Work status: Working");
 
                 WorkData workData = (WorkData) receivedPayload.getData();
                 int dotProduct = calculateDotProduct(workData.getRows(), workData.getCols());

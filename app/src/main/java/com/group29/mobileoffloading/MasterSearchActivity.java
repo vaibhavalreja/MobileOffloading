@@ -24,7 +24,6 @@ import com.google.android.gms.nearby.connection.DiscoveredEndpointInfo;
 import com.google.android.gms.nearby.connection.DiscoveryOptions;
 import com.google.android.gms.nearby.connection.EndpointDiscoveryCallback;
 import com.google.android.gms.nearby.connection.Payload;
-import com.google.android.gms.nearby.connection.PayloadTransferUpdate;
 import com.google.android.gms.nearby.connection.Strategy;
 import com.group29.mobileoffloading.CustomListAdapters.AvailableWorkersAdapter;
 import com.group29.mobileoffloading.BackgroundLoopers.Connector;
@@ -72,10 +71,26 @@ public class MasterSearchActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_master_discovery);
+        setContentView(R.layout.activity_master_search);
         masterNodeId = Settings.Secure.getString(getApplicationContext().getContentResolver(), Settings.Secure.ANDROID_ID);
         this.discoveryOptions = new DiscoveryOptions.Builder().setStrategy(Strategy.P2P_CLUSTER).build();
 
+        ((Button)findViewById(R.id.master_distribute_task_button)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ArrayList<AvailableWorker> readyDevices = getDevicesInReadyState();
+                if (readyDevices.size() == 0) {
+                    Log.d("TEST","no devices");
+                    Toast.makeText(getApplicationContext(), "No worker Available at the moment", Toast.LENGTH_LONG).show();
+                    onBackPressed();
+                } else {
+                    Log.d("TEST","herer");
+                    Nearby.getConnectionsClient(getApplicationContext()).stopDiscovery();
+                    startMasterActivity(readyDevices);
+                    finish();
+                }
+            }
+        });
         available_workers_rv = findViewById(R.id.rv_connected_devices);
         availableWorkersAdapter = new AvailableWorkersAdapter(this, availableWorkerDevices);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());
@@ -133,21 +148,6 @@ public class MasterSearchActivity extends AppCompatActivity {
         };
 
 
-    }
-
-
-    public void assignTasks(View view) {
-        ArrayList<AvailableWorker> readyDevices = getDevicesInReadyState();
-        if (readyDevices.size() == 0) {
-            Log.d("TEST","no devices");
-            Toast.makeText(getApplicationContext(), "No worker Available at the moment", Toast.LENGTH_LONG).show();
-            onBackPressed();
-        } else {
-            Log.d("TEST","herer");
-            Nearby.getConnectionsClient(getApplicationContext()).stopDiscovery();
-            startMasterActivity(readyDevices);
-            finish();
-        }
     }
 
     private ArrayList<AvailableWorker> getDevicesInReadyState() {
@@ -269,12 +269,12 @@ public class MasterSearchActivity extends AppCompatActivity {
     }
 
     void canAssign(DeviceInfo deviceStats) {
-        Button assignButton = findViewById(R.id.assignTask);
-        assignButton.setEnabled(deviceStats.getBatteryPercentage() > WorkAllocator.ThresholdsHolder.MINIMUM_BATTERY_LEVEL);
+        Button distributeWorkButton = findViewById(R.id.master_distribute_task_button);
+        distributeWorkButton.setEnabled(deviceStats.getBatteryPercentage() > WorkAllocator.ThresholdsHolder.MINIMUM_BATTERY_LEVEL);
     }
 
     void setState(String text) {
-        ((TextView) findViewById(R.id.discovery)).setText(text);
+        ((TextView) findViewById(R.id.master_search_tv)).setText(text);
     }
 
     @Override

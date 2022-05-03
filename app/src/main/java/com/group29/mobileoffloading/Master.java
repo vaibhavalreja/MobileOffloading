@@ -19,7 +19,7 @@ import com.group29.mobileoffloading.CustomListAdapters.WorkingWorkersAdapter;
 import com.group29.mobileoffloading.BackgroundLoopers.DeviceInfoBroadcaster;
 import com.group29.mobileoffloading.Helpers.NearbySingleton;
 import com.group29.mobileoffloading.Helpers.WorkAllocator;
-import com.group29.mobileoffloading.BackgroundLoopers.WorkerStatusSubscriber;
+import com.group29.mobileoffloading.BackgroundLoopers.WorkerListener;
 import com.group29.mobileoffloading.DataModels.AvailableWorker;
 import com.group29.mobileoffloading.DataModels.DeviceInfo;
 import com.group29.mobileoffloading.DataModels.WorkInfo;
@@ -36,15 +36,15 @@ public class Master extends AppCompatActivity {
 
     private RecyclerView rvWorkers;
 
-    private HashMap<String, WorkerStatusSubscriber> workerStatusSubscriberMap = new HashMap<>();
+    private final HashMap<String, WorkerListener> workerListenersMap = new HashMap<>();
 
-    private ArrayList<com.group29.mobileoffloading.DataModels.Worker> workers = new ArrayList<>();
+    private final ArrayList<com.group29.mobileoffloading.DataModels.Worker> workers = new ArrayList<>();
     private WorkingWorkersAdapter workingWorkersAdapter;
     
-    private int rows1 = 40;
-    private int cols1 = 40;
-    private int rows2 = 40;
-    private int cols2 = 40;
+    private final int rows1 = 40;
+    private final int cols1 = 40;
+    private final int rows2 = 40;
+    private final int cols2 = 40;
 
     private int[][] matrix1;
     private int[][] matrix2;
@@ -52,7 +52,6 @@ public class Master extends AppCompatActivity {
     private WorkAllocator workAllocator;
 
     private int workAmount;
-    private int totalPartitions;
     private Handler handler;
     private Runnable runnable;
     private DeviceInfoBroadcaster deviceInfoBroadcaster;
@@ -112,15 +111,14 @@ public class Master extends AppCompatActivity {
     }
 
     private void init() {
-        totalPartitions = rows1 * cols2;
+        int totalPartitions = rows1 * cols2;
         matrix1 = generateMatrix(rows1, cols1);
         matrix2 = generateMatrix(rows2, cols2);
         TextView totalPart = findViewById(R.id.work_array_partitions_tv);
         totalPart.setText("Number of Work Partitions:" + totalPartitions);
 
-        workAllocator = new WorkAllocator(getApplicationContext(), workers, matrix1, matrix2, slaveTime -> {
-            TextView slave = findViewById(R.id.worker_execution_time);
-            slave.setText("Execution time for Worker Nodes: " + slaveTime + "ms");
+        workAllocator = new WorkAllocator(getApplicationContext(), workers, matrix1, matrix2, workerExecutionTime -> {
+            ((TextView)findViewById(R.id.worker_execution_time_tv)).setText("Execution time for Worker Nodes: " + workerExecutionTime + "ms");
         });
         workAllocator.beginDistributedComputation();
     }
@@ -201,7 +199,7 @@ public class Master extends AppCompatActivity {
             long endTime = System.currentTimeMillis();
             long totalTime = endTime - startTime;
             FlushToFile.writeTextToFile(getApplicationContext(), "exec_time_master_alone.txt", false, totalTime + "ms");
-            TextView master = findViewById(R.id.masterTime);
+            TextView master = findViewById(R.id.master_execution_time_tv);
             master.setText("Execution time for Master Node: " + totalTime + "ms");
         });
     }
@@ -236,11 +234,11 @@ public class Master extends AppCompatActivity {
 
     private void startWorkerStatusSubscribers() {
         for (com.group29.mobileoffloading.DataModels.Worker worker : workers) {
-            if (workerStatusSubscriberMap.containsKey(worker.getEndpointId())) {
+            if (workerListenersMap.containsKey(worker.getEndpointId())) {
                 continue;
             }
 
-            WorkerStatusSubscriber workerStatusSubscriber = new WorkerStatusSubscriber(getApplicationContext(), worker.getEndpointId(), new WorkerStatusListener() {
+            WorkerListener workerListener = new WorkerListener(getApplicationContext(), worker.getEndpointId(), new WorkerStatusListener() {
                 @Override
                 public void onWorkStatusReceived(String nodeIdString, WorkInfo workStatus) {
 
@@ -268,8 +266,8 @@ public class Master extends AppCompatActivity {
                 }
             });
 
-            workerStatusSubscriber.start();
-            workerStatusSubscriberMap.put(worker.getEndpointId(), workerStatusSubscriber);
+            workerListener.start();
+            workerListenersMap.put(worker.getEndpointId(), workerListener);
         }
     }
 
@@ -327,10 +325,10 @@ public class Master extends AppCompatActivity {
 
     private void stopWorkerStatusSubscribers() {
         for (Worker worker : workers) {
-            WorkerStatusSubscriber workerStatusSubscriber = workerStatusSubscriberMap.get(worker.getEndpointId());
-            if (workerStatusSubscriber != null) {
-                workerStatusSubscriber.stop();
-                workerStatusSubscriberMap.remove(worker.getEndpointId());
+            WorkerListener workerListener = workerListenersMap.get(worker.getEndpointId());
+            if (workerListener != null) {
+                workerListener.stop();
+                workerListenersMap.remove(worker.getEndpointId());
             }
         }
     }
