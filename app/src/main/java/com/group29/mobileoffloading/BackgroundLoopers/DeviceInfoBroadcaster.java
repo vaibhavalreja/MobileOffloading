@@ -12,7 +12,7 @@ import android.util.Log;
 import com.group29.mobileoffloading.DataModels.ClientPayLoad;
 import com.group29.mobileoffloading.DataModels.DeviceInfo;
 import com.group29.mobileoffloading.Helpers.FusedLocationHelper;
-import com.group29.mobileoffloading.utilities.Constants;
+import com.group29.mobileoffloading.utilities.DataPacketStringKeys;
 import com.group29.mobileoffloading.utilities.DataTransfer;
 
 public class DeviceInfoBroadcaster {
@@ -21,16 +21,14 @@ public class DeviceInfoBroadcaster {
     private final String nodeIdString;
     private final Handler handler;
     private Runnable runnable;
-    private final int interval;
 
-    public DeviceInfoBroadcaster(Context context, String nodeIdString, int updateInterval) {
+    public DeviceInfoBroadcaster(Context context, String nodeIdString) {
         this.context = context;
         this.nodeIdString = nodeIdString;
-        this.interval = updateInterval;
         handler = new Handler(Looper.getMainLooper());
         runnable = () -> {
             publish();
-            handler.postDelayed(runnable, interval);
+            handler.postDelayed(runnable, 7000);
         };
     }
 
@@ -41,7 +39,7 @@ public class DeviceInfoBroadcaster {
                 getLocation(context).getLongitude()
         );
         if (nodeIdString != null) {
-            ClientPayLoad payload = new ClientPayLoad().setTag(Constants.PayloadTags.DEVICE_STATS).setData(deviceInfo);
+            ClientPayLoad payload = new ClientPayLoad().setTag(DataPacketStringKeys.DEVICE_STATS).setData(deviceInfo);
             DataTransfer.sendPayload(context, nodeIdString, payload);
         }
         Log.d("DEVICE_STATS", "DEVICE STATUS B: " + deviceInfo.getBatteryPercentage() + " P: " + deviceInfo.isCharging() + " L: " + deviceInfo.getLatitude() + " " + deviceInfo.getLongitude());
@@ -68,8 +66,8 @@ public class DeviceInfoBroadcaster {
     }
 
     public void start() {
-        handler.postDelayed(runnable, interval);
-        FusedLocationHelper.getInstance(context).start(interval);
+        handler.postDelayed(runnable, 7000);
+        FusedLocationHelper.getInstance(context).start(7000);
     }
 
     public void stop() {

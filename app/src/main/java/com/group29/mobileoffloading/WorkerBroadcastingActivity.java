@@ -22,11 +22,9 @@ import com.google.android.gms.nearby.connection.Strategy;
 import com.group29.mobileoffloading.BackgroundLoopers.DeviceInfoBroadcaster;
 import com.group29.mobileoffloading.Helpers.NearbySingleton;
 import com.group29.mobileoffloading.listeners.ClientConnectionListener;
-import com.group29.mobileoffloading.utilities.Constants;
-
-import org.w3c.dom.Text;
 
 public class WorkerBroadcastingActivity extends AppCompatActivity {
+    public static final String MASTER_NODE_ID_BUNDLE_KEY = "MASTER_NODE_ID_BUNDLE_KEY";
     private String workerId;
     private String masterId = "";
     private ClientConnectionListener connectionListener;
@@ -45,7 +43,7 @@ public class WorkerBroadcastingActivity extends AppCompatActivity {
         setDeviceId("Device ID: " + workerId);
 
         //Start Advertisement
-        deviceInfoBroadcaster = new DeviceInfoBroadcaster(getApplicationContext(), null, Constants.UPDATE_INTERVAL_UI);
+        deviceInfoBroadcaster = new DeviceInfoBroadcaster(getApplicationContext(), null);
 
         connectionListener = new ClientConnectionListener() {
             @Override
@@ -70,7 +68,7 @@ public class WorkerBroadcastingActivity extends AppCompatActivity {
         handler = new Handler(Looper.getMainLooper());
         runnable = () -> {
             refreshCardData();
-            handler.postDelayed(runnable, Constants.UPDATE_INTERVAL_UI);
+            handler.postDelayed(runnable, 7000);
         };
     }
 
@@ -85,7 +83,7 @@ public class WorkerBroadcastingActivity extends AppCompatActivity {
     void refreshCardData() {
         TextView st = findViewById(R.id.worker_broadcasting_battery_percentage_tv);
         st.setText("Level: " + DeviceInfoBroadcaster.getBatteryLevel(this) + "%");
-        ((TextView)findViewById(R.id.worker_broadcasting_charging_tv)).setText(String.format("Plugged In: %s", DeviceInfoBroadcaster.isPluggedIn(this) ? "true" : "false"));
+        ((TextView) findViewById(R.id.worker_broadcasting_charging_tv)).setText(String.format("Plugged In: %s", DeviceInfoBroadcaster.isPluggedIn(this) ? "true" : "false"));
         TextView latitude_tv = findViewById(R.id.worker_broadcasting_latitude_tv);
         TextView longitude_tv = findViewById(R.id.worker_broadcasting_longitude_tv);
         if (DeviceInfoBroadcaster.getLocation(this) != null) {
@@ -99,7 +97,7 @@ public class WorkerBroadcastingActivity extends AppCompatActivity {
 
     void showDialog(String masterNodeID) {
         DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
-            switch (which){
+            switch (which) {
                 case DialogInterface.BUTTON_POSITIVE:
                     NearbySingleton.getInstance(getApplicationContext()).acceptConnection(masterId);
                     startWorkerComputation();
@@ -111,11 +109,10 @@ public class WorkerBroadcastingActivity extends AppCompatActivity {
             }
         };
         AlertDialog.Builder builder = new AlertDialog.Builder(WorkerBroadcastingActivity.this);
-        builder.setMessage("Do you want to pair with master node" + masterNodeID +"?")
+        builder.setMessage("Do you want to pair with master node" + masterNodeID + "?")
                 .setPositiveButton("Yes", dialogClickListener)
                 .setNegativeButton("No", dialogClickListener).show();
     }
-
 
 
     @Override
@@ -136,7 +133,7 @@ public class WorkerBroadcastingActivity extends AppCompatActivity {
         NearbySingleton.getInstance(getApplicationContext()).registerClientConnectionListener(connectionListener);
         Log.d("WORKER", "Starting Device Stats");
         deviceInfoBroadcaster.start();
-        handler.postDelayed(runnable, Constants.UPDATE_INTERVAL_UI);
+        handler.postDelayed(runnable, 7000);
     }
 
     @Override
@@ -151,7 +148,7 @@ public class WorkerBroadcastingActivity extends AppCompatActivity {
     private void startWorkerComputation() {
         Intent intent = new Intent(getApplicationContext(), WorkerActivity.class);
         Bundle bundle = new Bundle();
-        bundle.putString(Constants.MASTER_ENDPOINT_ID, masterId);
+        bundle.putString(MASTER_NODE_ID_BUNDLE_KEY, masterId);
         intent.putExtras(bundle);
         startActivity(intent);
         Nearby.getConnectionsClient(getApplicationContext()).stopAdvertising();

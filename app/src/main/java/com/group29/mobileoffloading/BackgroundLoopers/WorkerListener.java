@@ -3,14 +3,13 @@ package com.group29.mobileoffloading.BackgroundLoopers;
 import android.content.Context;
 
 import com.google.android.gms.nearby.connection.Payload;
-import com.google.android.gms.nearby.connection.PayloadTransferUpdate;
-import com.group29.mobileoffloading.Helpers.NearbySingleton;
-import com.group29.mobileoffloading.listeners.PayloadListener;
-import com.group29.mobileoffloading.listeners.WorkerStatusListener;
 import com.group29.mobileoffloading.DataModels.ClientPayLoad;
 import com.group29.mobileoffloading.DataModels.DeviceInfo;
 import com.group29.mobileoffloading.DataModels.WorkInfo;
-import com.group29.mobileoffloading.utilities.Constants;
+import com.group29.mobileoffloading.Helpers.NearbySingleton;
+import com.group29.mobileoffloading.listeners.PayloadListener;
+import com.group29.mobileoffloading.listeners.WorkerStatusListener;
+import com.group29.mobileoffloading.utilities.DataPacketStringKeys;
 import com.group29.mobileoffloading.utilities.PayloadConverter;
 
 import java.io.IOException;
@@ -19,8 +18,8 @@ public class WorkerListener {
 
     private final Context context;
     private final String nodeIdString;
-    private PayloadListener payloadListener;
     private final WorkerStatusListener workerStatusListener;
+    private PayloadListener payloadListener;
 
     public WorkerListener(Context context, String nodeIdString, WorkerStatusListener workerStatusListener) {
         this.context = context;
@@ -33,14 +32,14 @@ public class WorkerListener {
             @Override
             public void onPayloadReceived(String nodeIdString, Payload payload) {
                 try {
-                    ClientPayLoad tPayload = (ClientPayLoad) PayloadConverter.fromPayload(payload);
+                    ClientPayLoad tPayload = PayloadConverter.fromPayload(payload);
                     String payloadTag = tPayload.getTag();
 
-                    if (payloadTag.equals(Constants.PayloadTags.WORK_STATUS)) {
+                    if (payloadTag.equals(DataPacketStringKeys.WORK_STATUS)) {
                         if (workerStatusListener != null) {
                             workerStatusListener.onWorkStatusReceived(nodeIdString, (WorkInfo) tPayload.getData());
                         }
-                    } else if (payloadTag.equals(Constants.PayloadTags.DEVICE_STATS)) {
+                    } else if (payloadTag.equals(DataPacketStringKeys.DEVICE_STATS)) {
                         if (workerStatusListener != null) {
                             workerStatusListener.onDeviceStatsReceived(nodeIdString, (DeviceInfo) tPayload.getData());
                         }

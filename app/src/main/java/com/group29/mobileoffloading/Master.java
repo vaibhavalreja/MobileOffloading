@@ -13,17 +13,17 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.SimpleItemAnimator;
 
-import com.group29.mobileoffloading.listeners.WorkerStatusListener;
-import com.group29.mobileoffloading.DataModels.Worker;
-import com.group29.mobileoffloading.CustomListAdapters.WorkingWorkersAdapter;
 import com.group29.mobileoffloading.BackgroundLoopers.DeviceInfoBroadcaster;
-import com.group29.mobileoffloading.Helpers.NearbySingleton;
-import com.group29.mobileoffloading.Helpers.WorkAllocator;
 import com.group29.mobileoffloading.BackgroundLoopers.WorkerListener;
+import com.group29.mobileoffloading.CustomListAdapters.WorkingWorkersAdapter;
 import com.group29.mobileoffloading.DataModels.AvailableWorker;
 import com.group29.mobileoffloading.DataModels.DeviceInfo;
 import com.group29.mobileoffloading.DataModels.WorkInfo;
-import com.group29.mobileoffloading.utilities.Constants;
+import com.group29.mobileoffloading.DataModels.Worker;
+import com.group29.mobileoffloading.Helpers.NearbySingleton;
+import com.group29.mobileoffloading.Helpers.WorkAllocator;
+import com.group29.mobileoffloading.listeners.WorkerStatusListener;
+import com.group29.mobileoffloading.stateVariables.WorkerStateVariables;
 import com.group29.mobileoffloading.utilities.FlushToFile;
 
 import java.util.ArrayList;
@@ -34,18 +34,15 @@ import needle.Needle;
 
 public class Master extends AppCompatActivity {
 
-    private RecyclerView rvWorkers;
-
+    public static final String AVAILABLE_DEVICES_LIST_BUNDLE_KEY = "AVAILABLE_DEVICES";
     private final HashMap<String, WorkerListener> workerListenersMap = new HashMap<>();
-
     private final ArrayList<com.group29.mobileoffloading.DataModels.Worker> workers = new ArrayList<>();
-    private WorkingWorkersAdapter workingWorkersAdapter;
-    
     private final int rows1 = 40;
     private final int cols1 = 40;
     private final int rows2 = 40;
     private final int cols2 = 40;
-
+    private RecyclerView rvWorkers;
+    private WorkingWorkersAdapter workingWorkersAdapter;
     private int[][] matrix1;
     private int[][] matrix2;
 
@@ -65,14 +62,14 @@ public class Master extends AppCompatActivity {
         TextView power_consumed_master_tv = findViewById(R.id.power_consumed_master_tv);
         power_consumed_master_tv.setText("Power Consumption for Master Node: null");
         BatteryManager mBatteryManager =
-                (BatteryManager)getSystemService(Context.BATTERY_SERVICE);
+                (BatteryManager) getSystemService(Context.BATTERY_SERVICE);
         Long initialEnergyMaster =
                 mBatteryManager.getLongProperty(BatteryManager.BATTERY_PROPERTY_ENERGY_COUNTER);
         computeMatrixMultiplicationOnMaster();
         Long finalEnergyMaster =
                 mBatteryManager.getLongProperty(BatteryManager.BATTERY_PROPERTY_ENERGY_COUNTER);
-        Long energyConsumedMaster = Math.abs(initialEnergyMaster-finalEnergyMaster);
-        power_consumed_master_tv.setText("Power Consumption for Master Node: " +Long.toString(energyConsumedMaster)+ " nWh");
+        Long energyConsumedMaster = Math.abs(initialEnergyMaster - finalEnergyMaster);
+        power_consumed_master_tv.setText("Power Consumption for Master Node: " + energyConsumedMaster + " nWh");
         Log.d("MasterDiscovery", "Completed computing matrix multiplication on only master");
 
         unpackBundle();
@@ -96,13 +93,13 @@ public class Master extends AppCompatActivity {
         super.onResume();
         startWorkerStatusSubscribers();
         deviceInfoBroadcaster.start();
-        handler.postDelayed(runnable, Constants.UPDATE_INTERVAL_UI);
+        handler.postDelayed(runnable, 7000);
     }
 
     @Override
     public void onBackPressed() {
         for (com.group29.mobileoffloading.DataModels.Worker w : workers) {
-            updateWorkerConnectionStatus(w.getEndpointId(), Constants.WorkStatus.DISCONNECTED);
+            updateWorkerConnectionStatus(w.getEndpointId(), WorkerStateVariables.DISCONNECTED);
             workAllocator.removeWorker(w.getEndpointId());
             NearbySingleton.getInstance(getApplicationContext()).disconnectFromEndpoint(w.getEndpointId());
         }
@@ -118,17 +115,17 @@ public class Master extends AppCompatActivity {
         totalPart.setText("Number of Work Partitions:" + totalPartitions);
 
         workAllocator = new WorkAllocator(getApplicationContext(), workers, matrix1, matrix2, workerExecutionTime -> {
-            ((TextView)findViewById(R.id.worker_execution_time_tv)).setText("Execution time for Worker Nodes: " + workerExecutionTime + "ms");
+            ((TextView) findViewById(R.id.worker_execution_time_tv)).setText("Execution time for Worker Nodes: " + workerExecutionTime + "ms");
         });
         workAllocator.beginDistributedComputation();
     }
 
-    public int[][] generateMatrix(int num_rows, int num_cols){
-        int [][] matrix = new int[num_rows][num_cols];
+    public int[][] generateMatrix(int num_rows, int num_cols) {
+        int[][] matrix = new int[num_rows][num_cols];
         Random rand = new Random();
 
-        for(int i = 0; i < num_rows; i++){
-            for(int j = 0 ; j < num_cols; j++){
+        for (int i = 0; i < num_rows; i++) {
+            for (int j = 0; j < num_cols; j++) {
                 matrix[i][j] = rand.nextInt(200);
             }
         }
@@ -158,7 +155,7 @@ public class Master extends AppCompatActivity {
         try {
             Bundle bundle = getIntent().getExtras();
 
-            ArrayList<AvailableWorker> availableWorkers = (ArrayList<AvailableWorker>) bundle.getSerializable(Constants.CONNECTED_DEVICES);
+            ArrayList<AvailableWorker> availableWorkers = (ArrayList<AvailableWorker>) bundle.getSerializable(AVAILABLE_DEVICES_LIST_BUNDLE_KEY);
             addToWorkers(availableWorkers);
             Log.d("CHECK", "Added a connected Device as worker");
         } catch (NullPointerException e) {
@@ -173,10 +170,10 @@ public class Master extends AppCompatActivity {
             worker.setEndpointName(availableWorker.getEndpointName());
 
             WorkInfo workStatus = new WorkInfo();
-            workStatus.setStatusInfo(Constants.WorkStatus.WORKING);
+            workStatus.setStatusInfo(WorkerStateVariables.WORKING);
 
             worker.setWorkStatus(workStatus);
-            worker.setDeviceStats(new DeviceInfo(0,false,0.0,0.0));
+            worker.setDeviceStats(new DeviceInfo(0, false, 0.0, 0.0));
 
             workers.add(worker);
         }
@@ -205,15 +202,14 @@ public class Master extends AppCompatActivity {
     }
 
 
-
     private void setupDeviceBatteryStatsCollector() {
-        deviceInfoBroadcaster = new DeviceInfoBroadcaster(getApplicationContext(), null, Constants.UPDATE_INTERVAL_UI);
+        deviceInfoBroadcaster = new DeviceInfoBroadcaster(getApplicationContext(), null);
         handler = new Handler();
         runnable = () -> {
             String deviceStatsStr = DeviceInfoBroadcaster.getBatteryLevel(this) + "%"
                     + "\t" + (DeviceInfoBroadcaster.isPluggedIn(this) ? "CHARGING" : "NOT CHARGING");
             FlushToFile.writeTextToFile(getApplicationContext(), "master_battery.txt", true, deviceStatsStr);
-            handler.postDelayed(runnable, Constants.UPDATE_INTERVAL_UI);
+            handler.postDelayed(runnable, 7000);
         };
     }
 
@@ -242,8 +238,8 @@ public class Master extends AppCompatActivity {
                 @Override
                 public void onWorkStatusReceived(String nodeIdString, WorkInfo workStatus) {
 
-                    if (workStatus.getStatusInfo().equals(Constants.WorkStatus.DISCONNECTED)) {
-                        updateWorkerConnectionStatus(nodeIdString, Constants.WorkStatus.DISCONNECTED);
+                    if (workStatus.getStatusInfo().equals(WorkerStateVariables.DISCONNECTED)) {
+                        updateWorkerConnectionStatus(nodeIdString, WorkerStateVariables.DISCONNECTED);
                         workAllocator.removeWorker(nodeIdString);
                         NearbySingleton.getInstance(getApplicationContext()).rejectConnection(nodeIdString);
                     } else {
@@ -288,7 +284,7 @@ public class Master extends AppCompatActivity {
             if (worker.getEndpointId().equals(nodeIdString)) {
                 worker.setWorkStatus(workStatus);
 
-                if (workStatus.getStatusInfo().equals(Constants.WorkStatus.WORKING) && workAllocator.isItNewWork(workStatus.getPartitionIndexInfo())) {
+                if (workStatus.getStatusInfo().equals(WorkerStateVariables.WORKING) && workAllocator.isItNewWork(workStatus.getPartitionIndexInfo())) {
                     workers.get(i).setWorkAmount(workers.get(i).getWorkAmount() + 1);
                     workAmount += 1;
                 }

@@ -5,7 +5,6 @@ import android.os.BatteryManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -16,13 +15,14 @@ import com.google.android.gms.nearby.connection.ConnectionInfo;
 import com.google.android.gms.nearby.connection.ConnectionResolution;
 import com.google.android.gms.nearby.connection.Payload;
 import com.group29.mobileoffloading.BackgroundLoopers.DeviceInfoBroadcaster;
-import com.group29.mobileoffloading.Helpers.NearbySingleton;
-import com.group29.mobileoffloading.listeners.ClientConnectionListener;
-import com.group29.mobileoffloading.listeners.PayloadListener;
 import com.group29.mobileoffloading.DataModels.ClientPayLoad;
 import com.group29.mobileoffloading.DataModels.WorkData;
 import com.group29.mobileoffloading.DataModels.WorkInfo;
-import com.group29.mobileoffloading.utilities.Constants;
+import com.group29.mobileoffloading.Helpers.NearbySingleton;
+import com.group29.mobileoffloading.listeners.ClientConnectionListener;
+import com.group29.mobileoffloading.listeners.PayloadListener;
+import com.group29.mobileoffloading.stateVariables.WorkerStateVariables;
+import com.group29.mobileoffloading.utilities.DataPacketStringKeys;
 import com.group29.mobileoffloading.utilities.DataTransfer;
 import com.group29.mobileoffloading.utilities.PayloadConverter;
 
@@ -30,28 +30,28 @@ import java.io.IOException;
 import java.util.HashSet;
 
 public class WorkerActivity extends AppCompatActivity {
+    BatteryManager mBatteryManager = null;
+    Long initialEnergyWorker, finalEnergyWorker, energyConsumedWorker;
     private String masterId;
     private DeviceInfoBroadcaster deviceStatsPublisher;
     private ClientConnectionListener connectionListener;
     private PayloadListener payloadCallback;
     private int currentPartitionIndex;
     private HashSet<Integer> finishedWork = new HashSet<>();
-    BatteryManager mBatteryManager = null;
-    Long initialEnergyWorker,finalEnergyWorker,energyConsumedWorker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_worker);
-        ((ImageButton) findViewById(R.id.worker_stop_working_button)).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.worker_stop_working_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 WorkInfo workStatus = new WorkInfo();
                 workStatus.setPartitionIndexInfo(currentPartitionIndex);
-                workStatus.setStatusInfo(Constants.WorkStatus.DISCONNECTED);
+                workStatus.setStatusInfo(WorkerStateVariables.DISCONNECTED);
 
                 ClientPayLoad tPayload1 = new ClientPayLoad();
-                tPayload1.setTag(Constants.PayloadTags.WORK_STATUS);
+                tPayload1.setTag(DataPacketStringKeys.WORK_STATUS);
                 tPayload1.setData(workStatus);
 
                 DataTransfer.sendPayload(getApplicationContext(), masterId, tPayload1);
@@ -63,28 +63,28 @@ public class WorkerActivity extends AppCompatActivity {
         setConnectionCallback();
         connectToMaster();
 
-        mBatteryManager = (BatteryManager)getSystemService(Context.BATTERY_SERVICE);
+        mBatteryManager = (BatteryManager) getSystemService(Context.BATTERY_SERVICE);
         initialEnergyWorker =
                 mBatteryManager.getLongProperty(BatteryManager.BATTERY_PROPERTY_ENERGY_COUNTER);
         Log.d("WORKER_COMPUTATION", "Capturing power consumption");
     }
 
     public void setStatusText(String text) {
-        ((TextView)findViewById(R.id.worker_state_tv)).setText(text);
+        ((TextView) findViewById(R.id.worker_state_tv)).setText(text);
     }
 
     public void onWorkFinished(String text) {
-        ((TextView)findViewById(R.id.worker_state_tv)).setText(text);
-        ((TextView) findViewById(R.id.worker_power_consumed_tv)).setText("Power Consumed : "  + Long.toString(energyConsumedWorker)+ " nWh");
+        ((TextView) findViewById(R.id.worker_state_tv)).setText(text);
+        ((TextView) findViewById(R.id.worker_power_consumed_tv)).setText("Power Consumed : " + energyConsumedWorker + " nWh");
     }
 
     private void extractBundle() {
         Bundle bundle = getIntent().getExtras();
-        this.masterId = bundle.getString(Constants.MASTER_ENDPOINT_ID);
+        this.masterId = bundle.getString(WorkerBroadcastingActivity.MASTER_NODE_ID_BUNDLE_KEY);
     }
 
     private void startDeviceStatsPublisher() {
-        deviceStatsPublisher = new DeviceInfoBroadcaster(getApplicationContext(), masterId, Constants.UPDATE_INTERVAL_UI);
+        deviceStatsPublisher = new DeviceInfoBroadcaster(getApplicationContext(), masterId);
     }
 
     private void connectToMaster() {
@@ -145,42 +145,40 @@ public class WorkerActivity extends AppCompatActivity {
     public void startWorking(Payload payload) {
         WorkInfo workStatus = new WorkInfo();
         ClientPayLoad sendPayload = new ClientPayLoad();
-        sendPayload.setTag(Constants.PayloadTags.WORK_STATUS);
+        sendPayload.setTag(DataPacketStringKeys.WORK_STATUS);
 
         try {
             ClientPayLoad receivedPayload = PayloadConverter.fromPayload(payload);
-            if (receivedPayload.getTag().equals(Constants.PayloadTags.WORK_DATA)) {
+            if (receivedPayload.getTag().equals(DataPacketStringKeys.WORK_DATA)) {
                 setStatusText("Work status: Working");
 
                 WorkData workData = (WorkData) receivedPayload.getData();
                 int dotProduct = calculateDotProduct(workData.getRows(), workData.getCols());
 
                 Log.d("WORKER_COMPUTATION", "Partition Index: " + workData.getPartitionIndex());
-                if (!finishedWork.contains(workData.getPartitionIndex())) {
-                    finishedWork.add(workData.getPartitionIndex());
-                }
+                finishedWork.add(workData.getPartitionIndex());
                 currentPartitionIndex = workData.getPartitionIndex();
 
                 workStatus.setPartitionIndexInfo(workData.getPartitionIndex());
                 workStatus.setResultInfo(dotProduct);
 
-                workStatus.setStatusInfo(Constants.WorkStatus.WORKING);
+                workStatus.setStatusInfo(WorkerStateVariables.WORKING);
                 sendPayload.setData(workStatus);
                 DataTransfer.sendPayload(getApplicationContext(), masterId, sendPayload);
 
-            } else if (receivedPayload.getTag().equals(Constants.PayloadTags.FAREWELL)) {
+            } else if (receivedPayload.getTag().equals(DataPacketStringKeys.FAREWELL)) {
                 // end measuring energy level
                 finalEnergyWorker =
                         mBatteryManager.getLongProperty(BatteryManager.BATTERY_PROPERTY_ENERGY_COUNTER);
-                energyConsumedWorker = Math.abs(initialEnergyWorker-finalEnergyWorker);
+                energyConsumedWorker = Math.abs(initialEnergyWorker - finalEnergyWorker);
                 onWorkFinished("Work Done !!");
                 Log.d("WORKER_COMPUTATION", "Work Done");
-                workStatus.setStatusInfo(Constants.WorkStatus.FINISHED);
+                workStatus.setStatusInfo(WorkerStateVariables.FINISHED);
                 sendPayload.setData(workStatus);
                 DataTransfer.sendPayload(getApplicationContext(), masterId, sendPayload);
                 deviceStatsPublisher.stop();
 
-            } else if (receivedPayload.getTag().equals(Constants.PayloadTags.DISCONNECTED)) {
+            } else if (receivedPayload.getTag().equals(DataPacketStringKeys.DISCONNECTED)) {
                 navBack();
             }
 
@@ -189,10 +187,10 @@ public class WorkerActivity extends AppCompatActivity {
         }
     }
 
-    public int calculateDotProduct(int[] a, int[] b){
+    public int calculateDotProduct(int[] a, int[] b) {
         int product = 0;
-        for(int i = 0 ; i < a.length; i++){
-            product +=  (a[i] * b[i]);
+        for (int i = 0; i < a.length; i++) {
+            product += (a[i] * b[i]);
         }
         return product;
     }

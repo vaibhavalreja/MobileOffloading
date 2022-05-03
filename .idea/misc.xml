@@ -14,15 +14,17 @@
         <entry key="app/src/main/res/drawable/location_img_foreground.xml" value="0.186" />
         <entry key="app/src/main/res/drawable/stop_img_foreground.xml" value="0.186" />
         <entry key="app/src/main/res/drawable/worker_border.xml" value="0.18" />
-        <entry key="app/src/main/res/layout/activity_main.xml" value="0.165" />
+        <entry key="app/src/main/res/layout/activity_main.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_master.xml" value="0.25" />
         <entry key="app/src/main/res/layout/activity_master_discovery.xml" value="0.25" />
-        <entry key="app/src/main/res/layout/activity_worker.xml" value="0.25" />
+        <entry key="app/src/main/res/layout/activity_worker.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_worker_advertisement.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_worker_computation.xml" value="0.25" />
+        <entry key="app/src/main/res/layout/available_worker_list_item.xml" value="0.18840579710144928" />
         <entry key="app/src/main/res/layout/confirmation_dialog.xml" value="0.25" />
         <entry key="app/src/main/res/layout/connected_device_item.xml" value="0.25" />
         <entry key="app/src/main/res/layout/item_worker.xml" value="0.335" />
+        <entry key="app/src/main/res/layout/worker_list_item.xml" value="0.1" />
         <entry key="app/src/main/res/mipmap-anydpi-v26/battery_img.xml" value="0.18" />
         <entry key="app/src/main/res/mipmap-anydpi-v26/battery_img_round.xml" value="0.18" />
         <entry key="app/src/main/res/mipmap-anydpi-v26/location_img.xml" value="0.18" />

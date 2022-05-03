@@ -1,18 +1,23 @@
 package com.group29.mobileoffloading.Helpers;
 
+import static com.group29.mobileoffloading.stateVariables.WorkerStateVariables.DISCONNECTED;
+import static com.group29.mobileoffloading.stateVariables.WorkerStateVariables.FAILED;
+import static com.group29.mobileoffloading.stateVariables.WorkerStateVariables.WORKING;
+
 import android.content.Context;
 import android.os.Handler;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.gms.nearby.connection.Payload;
+import com.group29.mobileoffloading.BackgroundLoopers.Connector;
 import com.group29.mobileoffloading.DataModels.ClientPayLoad;
 import com.group29.mobileoffloading.DataModels.WorkData;
 import com.group29.mobileoffloading.DataModels.WorkInfo;
 import com.group29.mobileoffloading.DataModels.Worker;
-import com.group29.mobileoffloading.BackgroundLoopers.Connector;
 import com.group29.mobileoffloading.listeners.ComputationListener;
-import com.group29.mobileoffloading.utilities.Constants;
+import com.group29.mobileoffloading.stateVariables.WorkerStateVariables;
+import com.group29.mobileoffloading.utilities.DataPacketStringKeys;
 import com.group29.mobileoffloading.utilities.FlushToFile;
 import com.group29.mobileoffloading.utilities.PayloadConverter;
 
@@ -138,7 +143,7 @@ public class WorkAllocator {
             workData.setCols(cols);
 
             ClientPayLoad payload = new ClientPayLoad();
-            payload.setTag(Constants.PayloadTags.WORK_DATA);
+            payload.setTag(DataPacketStringKeys.WORK_DATA);
             payload.setData(workData);
             try {
                 //TODO find out communication here : Done
@@ -204,15 +209,15 @@ public class WorkAllocator {
             return; // initialization is not done yet
         }
 
-        if (workInfo.getStatusInfo().equals(Constants.WorkStatus.WORKING)) {
+        if (workInfo.getStatusInfo().equals(WORKING)) {
             partitionResults.put(workInfo.getPartitionIndexInfo(), workInfo.getResultInfo());
         }
 
-        if (workInfo.getStatusInfo().equals(Constants.WorkStatus.FAILED) || workInfo.getStatusInfo().equals(Constants.WorkStatus.DISCONNECTED)) {
+        if (workInfo.getStatusInfo().equals(FAILED) || workInfo.getStatusInfo().equals(WorkerStateVariables.DISCONNECTED)) {
             addWorkToQueue(workInfo.getPartitionIndexInfo());
         }
 
-        if (!workInfo.getStatusInfo().equals(Constants.WorkStatus.DISCONNECTED)) {
+        if (!workInfo.getStatusInfo().equals(DISCONNECTED)) {
             addWorkersToQueue(worker);
         }
 
@@ -232,11 +237,10 @@ public class WorkAllocator {
         handler.removeCallbacks(runnable);
 
         for (Worker worker : workers) {
-            if (!worker.getWorkStatus().getStatusInfo().equals(Constants.WorkStatus.DISCONNECTED)) {
+            if (!worker.getWorkStatus().getStatusInfo().equals(WorkerStateVariables.DISCONNECTED)) {
                 ClientPayLoad payload = new ClientPayLoad();
-                payload.setTag(Constants.PayloadTags.FAREWELL);
+                payload.setTag(DataPacketStringKeys.FAREWELL);
 
-                //TODO: Send data to device on connection. Done
                 Connector.sendToDevice(context, worker.getEndpointId(), payload);
                 NearbySingleton.getInstance(context).rejectConnection(worker.getEndpointId());
             }
