@@ -5,5 +5,4 @@ import com.google.android.gms.nearby.connection.PayloadTransferUpdate;
 
 public interface PayloadListener {
     void onPayloadReceived(String nodeIdString, Payload payload);
-    void onPayloadTransferUpdate( String nodeIdString,  PayloadTransferUpdate payloadTransferUpdate);
 }

@@ -1,4 +1,4 @@
-package com.group29.mobileoffloading.backgroundservices;
+package com.group29.mobileoffloading.BackgroundLoopers;
 
 import android.content.Context;
 import android.content.Intent;
@@ -11,6 +11,7 @@ import android.util.Log;
 
 import com.group29.mobileoffloading.DataModels.ClientPayLoad;
 import com.group29.mobileoffloading.DataModels.DeviceInfo;
+import com.group29.mobileoffloading.Helpers.FusedLocationHelper;
 import com.group29.mobileoffloading.utilities.Constants;
 import com.group29.mobileoffloading.utilities.DataTransfer;
 
@@ -35,12 +36,12 @@ public class DeviceInfoBroadcaster {
 
     public void start() {
         handler.postDelayed(runnable,  interval);
-        LocationService.getInstance(context).start(interval);
+        FusedLocationHelper.getInstance(context).start(interval);
     }
 
     public void stop() {
         handler.removeCallbacks(runnable);
-        LocationService.getInstance(context).stop();
+        FusedLocationHelper.getInstance(context).stop();
     }
 
     private void publish() {
@@ -48,7 +49,6 @@ public class DeviceInfoBroadcaster {
     }
 
     public static void publish(Context context, String nodeIdString) {
-        // Get Device Statistics
         DeviceInfo deviceInfo = new DeviceInfo();
         deviceInfo.setBatteryLevel(getBatteryLevel(context));
         deviceInfo.setCharging(isPluggedIn(context));
@@ -61,7 +61,7 @@ public class DeviceInfoBroadcaster {
     }
 
     public static Location getLocation(Context context) {
-        Location location = LocationService.getInstance(context).getLastAvailableLocation();
+        Location location = FusedLocationHelper.getInstance(context).getLastAvailableLocation();
         return location;
     }
 

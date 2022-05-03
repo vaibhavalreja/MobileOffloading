@@ -1,4 +1,4 @@
-package com.group29.mobileoffloading.backgroundservices;
+package com.group29.mobileoffloading.BackgroundLoopers;
 
 import android.content.Context;
 

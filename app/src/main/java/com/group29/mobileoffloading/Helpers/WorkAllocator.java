@@ -1,4 +1,4 @@
-package com.group29.mobileoffloading.backgroundservices;
+package com.group29.mobileoffloading.Helpers;
 
 import android.content.Context;
 import android.os.Handler;
@@ -10,6 +10,7 @@ import com.group29.mobileoffloading.DataModels.ClientPayLoad;
 import com.group29.mobileoffloading.DataModels.WorkData;
 import com.group29.mobileoffloading.DataModels.WorkInfo;
 import com.group29.mobileoffloading.DataModels.Worker;
+import com.group29.mobileoffloading.BackgroundLoopers.Connector;
 import com.group29.mobileoffloading.listeners.ComputationListener;
 import com.group29.mobileoffloading.utilities.Constants;
 import com.group29.mobileoffloading.utilities.FlushToFile;

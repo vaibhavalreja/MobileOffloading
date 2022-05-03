@@ -1,9 +1,10 @@
-package com.group29.mobileoffloading.backgroundservices;
+package com.group29.mobileoffloading.BackgroundLoopers;
 
 import android.content.Context;
 
 import com.google.android.gms.nearby.connection.Payload;
 import com.google.android.gms.nearby.connection.PayloadTransferUpdate;
+import com.group29.mobileoffloading.Helpers.NearbySingleton;
 import com.group29.mobileoffloading.listeners.PayloadListener;
 import com.group29.mobileoffloading.listeners.WorkerStatusListener;
 import com.group29.mobileoffloading.DataModels.ClientPayLoad;

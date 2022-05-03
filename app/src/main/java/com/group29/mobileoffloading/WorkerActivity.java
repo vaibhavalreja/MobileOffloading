@@ -19,8 +19,8 @@ import com.google.android.gms.nearby.connection.AdvertisingOptions;
 import com.google.android.gms.nearby.connection.ConnectionInfo;
 import com.google.android.gms.nearby.connection.ConnectionResolution;
 import com.google.android.gms.nearby.connection.Strategy;
-import com.group29.mobileoffloading.backgroundservices.DeviceInfoBroadcaster;
-import com.group29.mobileoffloading.backgroundservices.NearbySingleton;
+import com.group29.mobileoffloading.BackgroundLoopers.DeviceInfoBroadcaster;
+import com.group29.mobileoffloading.Helpers.NearbySingleton;
 import com.group29.mobileoffloading.listeners.ClientConnectionListener;
 import com.group29.mobileoffloading.utilities.Constants;
 

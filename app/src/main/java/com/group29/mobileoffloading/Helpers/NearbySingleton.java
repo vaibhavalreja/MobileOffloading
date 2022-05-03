@@ -1,5 +1,6 @@
-package com.group29.mobileoffloading.backgroundservices;
+package com.group29.mobileoffloading.Helpers;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
@@ -22,13 +23,14 @@ import java.util.HashSet;
 
 public class NearbySingleton {
 
+    @SuppressLint("StaticFieldLeak")
     private static NearbySingleton nearbySingleton;
-    private Context context;
+    private final Context context;
 
-    private ConnectionLifecycleCallback connectionLifecycleCallback;
-    private HashSet<ClientConnectionListener> clientConnectionListenerSet = new HashSet<>();
+    private final ConnectionLifecycleCallback connectionLifecycleCallback;
+    private final HashSet<ClientConnectionListener> clientConnectionListenerSet = new HashSet<>();
 
-    private HashSet<PayloadListener> payloadListenersSet = new HashSet<>();
+    private final HashSet<PayloadListener> payloadListenersSet = new HashSet<>();
 
     public NearbySingleton(Context context) {
         this.context = context;
@@ -120,38 +122,32 @@ public class NearbySingleton {
     public Task<Void> advertise(String clientId, AdvertisingOptions advertisingOptions) {
         return Nearby.getConnectionsClient(context)
                 .startAdvertising(clientId, context.getPackageName(), connectionLifecycleCallback, advertisingOptions)
-                .addOnFailureListener((Exception e) -> {
-                    e.printStackTrace();
-                });
+                .addOnFailureListener(Throwable::printStackTrace);
     }
 
-    public boolean registerPayloadListener(PayloadListener payloadListener) {
+    public void registerPayloadListener(PayloadListener payloadListener) {
         if (payloadListener != null) {
-            return payloadListenersSet.add(payloadListener);
+            payloadListenersSet.add(payloadListener);
         }
-        return false;
     }
 
-    public boolean registerClientConnectionListener(ClientConnectionListener clientConnectionListener) {
+    public void registerClientConnectionListener(ClientConnectionListener clientConnectionListener) {
         if (clientConnectionListener != null) {
-            return clientConnectionListenerSet.add(clientConnectionListener);
+            clientConnectionListenerSet.add(clientConnectionListener);
         }
-        return false;
     }
 
-    public boolean unregisterPayloadListener(PayloadListener payloadListener) {
+    public void unregisterPayloadListener(PayloadListener payloadListener) {
         if (payloadListener != null) {
-            return payloadListenersSet.remove(payloadListener);
+            payloadListenersSet.remove(payloadListener);
         }
-        return false;
     }
 
 
-    public boolean unregisterClientConnectionListener(ClientConnectionListener clientConnectionListener) {
+    public void unregisterClientConnectionListener(ClientConnectionListener clientConnectionListener) {
         if (clientConnectionListener != null) {
-            return clientConnectionListenerSet.remove(clientConnectionListener);
+            clientConnectionListenerSet.remove(clientConnectionListener);
         }
-        return false;
     }
 }
 
