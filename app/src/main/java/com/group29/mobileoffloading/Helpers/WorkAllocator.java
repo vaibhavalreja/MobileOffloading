@@ -301,12 +301,12 @@ public class WorkAllocator {
         @Override
         public int compare(Worker worker1, Worker worker2) {
 
-            if ((worker1.getDeviceStats().getBatteryLevel() - worker2.getDeviceStats().getBatteryLevel()) > ThresholdsHolder.BATTERY_LEVEL_DIFFERENCE) {
-                return worker1.getDeviceStats().getBatteryLevel() - worker2.getDeviceStats().getBatteryLevel();
+            if ((worker1.getDeviceStats().getBatteryPercentage() - worker2.getDeviceStats().getBatteryPercentage()) > ThresholdsHolder.BATTERY_LEVEL_DIFFERENCE) {
+                return worker1.getDeviceStats().getBatteryPercentage() - worker2.getDeviceStats().getBatteryPercentage();
             }
 
             if (worker1.getDeviceStats().isCharging() && worker2.getDeviceStats().isCharging()) {
-                return worker1.getDeviceStats().getBatteryLevel() - worker2.getDeviceStats().getBatteryLevel();
+                return worker1.getDeviceStats().getBatteryPercentage() - worker2.getDeviceStats().getBatteryPercentage();
             } else if (worker1.getDeviceStats().isCharging()) {
                 return 1;
             } else {

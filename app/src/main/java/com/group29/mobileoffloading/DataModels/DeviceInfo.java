@@ -6,28 +6,24 @@ import java.io.Serializable;
 
 public class DeviceInfo implements Serializable {
 
-    private int batteryLevel;
-    private boolean charging;
+    private final int batteryPercentage;
+    private final boolean chargingStatus;
+    private final double latitude;
+    private final double longitude;
 
-    private double latitude;
-    private double longitude;
-
-    private boolean locationValid;
-
-    public int getBatteryLevel() {
-        return batteryLevel;
+    public DeviceInfo(Integer batteryPecentage, Boolean chargingStatus, Double latitude, Double longitude){
+        this.batteryPercentage = batteryPecentage;
+        this.chargingStatus = chargingStatus;
+        this.latitude = latitude;
+        this.longitude = longitude;
     }
 
-    public void setBatteryLevel(int batteryLevel) {
-        this.batteryLevel = batteryLevel;
+    public int getBatteryPercentage() {
+        return batteryPercentage;
     }
 
     public boolean isCharging() {
-        return charging;
-    }
-
-    public void setCharging(boolean charging) {
-        this.charging = charging;
+        return chargingStatus;
     }
 
     public double getLatitude() {
@@ -36,19 +32,5 @@ public class DeviceInfo implements Serializable {
 
     public double getLongitude() {
         return longitude;
-    }
-
-    public boolean isLocationValid() {
-        return locationValid;
-    }
-
-    public void setLocation(Location loc) {
-        if(loc != null) {
-            this.latitude = loc.getLatitude();
-            this.longitude = loc.getLongitude();
-            this.locationValid = true;
-        } else {
-            this.locationValid = false;
-        }
     }
 }

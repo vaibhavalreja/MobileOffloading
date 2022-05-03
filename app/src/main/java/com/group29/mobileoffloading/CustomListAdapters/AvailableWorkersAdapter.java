@@ -37,7 +37,7 @@ public class AvailableWorkersAdapter extends RecyclerView.Adapter<AvailableWorke
     @Override
     public void onBindViewHolder(@NonNull AvailableWorkersAdapter.ViewHolder holder, int position) {
         holder.available_worker_id_tv.setText(String.format("%s %s", availableWorkers.get(position).getEndpointId(), availableWorkers.get(position).getEndpointName()));
-        holder.battery_percentage_tv.setText(availableWorkers.get(position).getDeviceStats().getBatteryLevel());
+        holder.battery_percentage_tv.setText(availableWorkers.get(position).getDeviceStats().getBatteryPercentage());
         holder.worker_connection_state_tv.setText(availableWorkers.get(position).getRequestStatus());
     }
 

@@ -49,11 +49,6 @@ public class WorkerStatusSubscriber {
                     e.printStackTrace();
                 }
             }
-
-            @Override
-            public void onPayloadTransferUpdate(String nodeIdString, PayloadTransferUpdate payloadTransferUpdate) {
-
-            }
         };
 
         NearbySingleton.getInstance(context).registerPayloadListener(payloadListener);

@@ -17,11 +17,11 @@ import com.group29.mobileoffloading.utilities.DataTransfer;
 
 public class DeviceInfoBroadcaster {
 
-    private Context context;
-    private String nodeIdString;
-    private Handler handler;
+    private final Context context;
+    private final String nodeIdString;
+    private final Handler handler;
     private Runnable runnable;
-    private int interval;
+    private final int interval;
 
     public DeviceInfoBroadcaster(Context context, String nodeIdString, int updateInterval) {
         this.context = context;
@@ -34,30 +34,17 @@ public class DeviceInfoBroadcaster {
         };
     }
 
-    public void start() {
-        handler.postDelayed(runnable,  interval);
-        FusedLocationHelper.getInstance(context).start(interval);
-    }
-
-    public void stop() {
-        handler.removeCallbacks(runnable);
-        FusedLocationHelper.getInstance(context).stop();
-    }
-
-    private void publish() {
-        DeviceInfoBroadcaster.publish(this.context, this.nodeIdString);
-    }
-
     public static void publish(Context context, String nodeIdString) {
-        DeviceInfo deviceInfo = new DeviceInfo();
-        deviceInfo.setBatteryLevel(getBatteryLevel(context));
-        deviceInfo.setCharging(isPluggedIn(context));
-        deviceInfo.setLocation(getLocation(context));
-        if(nodeIdString != null) {
+        DeviceInfo deviceInfo = new DeviceInfo(getBatteryLevel(context),
+                isPluggedIn(context),
+                getLocation(context).getLatitude(),
+                getLocation(context).getLongitude()
+        );
+        if (nodeIdString != null) {
             ClientPayLoad payload = new ClientPayLoad().setTag(Constants.PayloadTags.DEVICE_STATS).setData(deviceInfo);
             DataTransfer.sendPayload(context, nodeIdString, payload);
         }
-        Log.d("DEVICE_STATS", "DEVICE STATUS B: " + deviceInfo.getBatteryLevel() + " P: " + deviceInfo.isCharging() +  " L: " + deviceInfo.getLatitude() + " " + deviceInfo.getLongitude());
+        Log.d("DEVICE_STATS", "DEVICE STATUS B: " + deviceInfo.getBatteryPercentage() + " P: " + deviceInfo.isCharging() + " L: " + deviceInfo.getLatitude() + " " + deviceInfo.getLongitude());
     }
 
     public static Location getLocation(Context context) {
@@ -74,11 +61,24 @@ public class DeviceInfoBroadcaster {
         Intent intent = context.registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
         int isCharging = intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1);
         final boolean b;
-        if (isCharging == BatteryManager.BATTERY_PLUGGED_AC
+        b = isCharging == BatteryManager.BATTERY_PLUGGED_AC
                 || isCharging == BatteryManager.BATTERY_PLUGGED_USB
-                || isCharging == BatteryManager.BATTERY_PLUGGED_WIRELESS) b = true;
-        else b = false;
+                || isCharging == BatteryManager.BATTERY_PLUGGED_WIRELESS;
         return b;
+    }
+
+    public void start() {
+        handler.postDelayed(runnable, interval);
+        FusedLocationHelper.getInstance(context).start(interval);
+    }
+
+    public void stop() {
+        handler.removeCallbacks(runnable);
+        FusedLocationHelper.getInstance(context).stop();
+    }
+
+    private void publish() {
+        DeviceInfoBroadcaster.publish(this.context, this.nodeIdString);
     }
 
 }

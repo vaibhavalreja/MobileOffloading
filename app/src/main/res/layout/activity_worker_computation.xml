@@ -6,7 +6,7 @@
     android:layout_gravity="center_vertical|center_horizontal"
     android:orientation="vertical"
     android:background="@drawable/customborder"
-    tools:context=".Worker_Computation">
+    tools:context=".WorkerActivity">
 
     <TextView
         android:layout_width="wrap_content"

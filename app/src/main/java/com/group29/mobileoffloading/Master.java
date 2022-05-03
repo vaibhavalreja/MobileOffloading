@@ -40,9 +40,7 @@ public class Master extends AppCompatActivity {
 
     private ArrayList<com.group29.mobileoffloading.DataModels.Worker> workers = new ArrayList<>();
     private WorkingWorkersAdapter workingWorkersAdapter;
-
-
-    // Matrix size definition
+    
     private int rows1 = 40;
     private int cols1 = 40;
     private int rows2 = 40;
@@ -57,7 +55,7 @@ public class Master extends AppCompatActivity {
     private int totalPartitions;
     private Handler handler;
     private Runnable runnable;
-    private DeviceInfoBroadcaster deviceStatsPublisher;
+    private DeviceInfoBroadcaster deviceInfoBroadcaster;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,7 +88,7 @@ public class Master extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         stopWorkerStatusSubscribers();
-        deviceStatsPublisher.stop();
+        deviceInfoBroadcaster.stop();
         handler.removeCallbacks(runnable);
     }
 
@@ -98,7 +96,7 @@ public class Master extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         startWorkerStatusSubscribers();
-        deviceStatsPublisher.start();
+        deviceInfoBroadcaster.start();
         handler.postDelayed(runnable, Constants.UPDATE_INTERVAL_UI);
     }
 
@@ -180,7 +178,7 @@ public class Master extends AppCompatActivity {
             workStatus.setStatusInfo(Constants.WorkStatus.WORKING);
 
             worker.setWorkStatus(workStatus);
-            worker.setDeviceStats(new DeviceInfo());
+            worker.setDeviceStats(new DeviceInfo(0,false,0.0,0.0));
 
             workers.add(worker);
         }
@@ -211,7 +209,7 @@ public class Master extends AppCompatActivity {
 
 
     private void setupDeviceBatteryStatsCollector() {
-        deviceStatsPublisher = new DeviceInfoBroadcaster(getApplicationContext(), null, Constants.UPDATE_INTERVAL_UI);
+        deviceInfoBroadcaster = new DeviceInfoBroadcaster(getApplicationContext(), null, Constants.UPDATE_INTERVAL_UI);
         handler = new Handler();
         runnable = () -> {
             String deviceStatsStr = DeviceInfoBroadcaster.getBatteryLevel(this) + "%"
@@ -260,7 +258,7 @@ public class Master extends AppCompatActivity {
                 public void onDeviceStatsReceived(String nodeIdString, DeviceInfo deviceStats) {
                     updateWorkerStatus(nodeIdString, deviceStats);
 
-                    String deviceStatsStr = deviceStats.getBatteryLevel() + "%"
+                    String deviceStatsStr = deviceStats.getBatteryPercentage() + "%"
                             + "\t" + (deviceStats.isCharging() ? "CHARGING" : "NOT CHARGING")
                             + "\t\t" + deviceStats.getLatitude()
                             + "\t" + deviceStats.getLongitude();
@@ -313,7 +311,7 @@ public class Master extends AppCompatActivity {
             if (worker.getEndpointId().equals(nodeIdString)) {
                 worker.setDeviceStats(deviceStats);
                 Location masterLocation = DeviceInfoBroadcaster.getLocation(this);
-                if (deviceStats.isLocationValid() && masterLocation != null) {
+                if ((deviceStats.getLatitude() == 0.0 || deviceStats.getLongitude() != 0.0) && masterLocation != null) {
                     float[] results = new float[1];
                     Location.distanceBetween(masterLocation.getLatitude(), masterLocation.getLongitude(),
                             deviceStats.getLatitude(), deviceStats.getLongitude(), results);

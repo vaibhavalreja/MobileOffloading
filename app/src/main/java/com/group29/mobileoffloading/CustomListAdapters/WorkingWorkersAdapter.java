@@ -40,7 +40,7 @@ public class WorkingWorkersAdapter extends RecyclerView.Adapter<WorkingWorkersAd
         holder.worked_id_tv.setText(String.format("%s %s", workingWorkers.get(position).getEndpointId(), workingWorkers.get(position).getEndpointName()));
         holder.worker_state_tv.setText(workingWorkers.get(position).getWorkStatus().getStatusInfo());
         
-        holder.battery_percentage_tv.setText(workingWorkers.get(position).getDeviceStats().getBatteryLevel());
+        holder.battery_percentage_tv.setText(workingWorkers.get(position).getDeviceStats().getBatteryPercentage());
         holder.is_charging_tv.setText(String.valueOf(workingWorkers.get(position).getDeviceStats().isCharging()));
         
         holder.work_done_tv.setText(String.valueOf(workingWorkers.get(position).getWorkAmount()));

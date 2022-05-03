@@ -5,7 +5,6 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
-import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -14,7 +13,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -36,9 +34,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         spinner.setOnItemSelectedListener(this);
 
         (findViewById(R.id.app_role_submit)).setOnClickListener(view -> {
-            Intent intent = new Intent(getApplicationContext(), Master_Discovery.class);
+            Intent intent = new Intent(getApplicationContext(), MasterSearchActivity.class);
             if(!selectedRole.equals("Master")){
-                intent = new Intent(getApplicationContext(), WorkerActivity.class);
+                intent = new Intent(getApplicationContext(), WorkerBroadcastingActivity.class);
             }
             startActivity(intent);
         });

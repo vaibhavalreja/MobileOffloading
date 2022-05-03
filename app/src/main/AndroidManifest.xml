@@ -32,9 +32,9 @@
             </intent-filter>
         </activity>
         <activity android:name=".Master" android:screenOrientation="portrait"/>
-        <activity android:name=".Master_Discovery"/>
+        <activity android:name=".MasterSearchActivity"/>
+        <activity android:name=".WorkerBroadcastingActivity"/>
         <activity android:name=".WorkerActivity"/>
-        <activity android:name=".Worker_Computation"/>
 
     </application>
 

@@ -7,7 +7,7 @@
     android:background="@drawable/customborder"
     android:orientation="vertical"
     android:padding="15dp"
-    tools:context=".WorkerActivity">
+    tools:context=".WorkerBroadcastingActivity">
 
     <TextView
         android:layout_width="match_parent"

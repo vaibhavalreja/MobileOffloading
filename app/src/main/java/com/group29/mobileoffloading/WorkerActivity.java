@@ -1,173 +1,204 @@
 package com.group29.mobileoffloading;
 
-import android.annotation.SuppressLint;
-import android.content.DialogInterface;
-import android.content.Intent;
+import android.content.Context;
+import android.os.BatteryManager;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.provider.Settings;
 import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
 
-import androidx.appcompat.app.AlertDialog;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.gms.common.api.ApiException;
-import com.google.android.gms.nearby.Nearby;
-import com.google.android.gms.nearby.connection.AdvertisingOptions;
 import com.google.android.gms.nearby.connection.ConnectionInfo;
 import com.google.android.gms.nearby.connection.ConnectionResolution;
-import com.google.android.gms.nearby.connection.Strategy;
+import com.google.android.gms.nearby.connection.Payload;
+import com.google.android.gms.nearby.connection.PayloadTransferUpdate;
 import com.group29.mobileoffloading.BackgroundLoopers.DeviceInfoBroadcaster;
 import com.group29.mobileoffloading.Helpers.NearbySingleton;
 import com.group29.mobileoffloading.listeners.ClientConnectionListener;
+import com.group29.mobileoffloading.listeners.PayloadListener;
+import com.group29.mobileoffloading.DataModels.ClientPayLoad;
+import com.group29.mobileoffloading.DataModels.WorkData;
+import com.group29.mobileoffloading.DataModels.WorkInfo;
 import com.group29.mobileoffloading.utilities.Constants;
+import com.group29.mobileoffloading.utilities.DataTransfer;
+import com.group29.mobileoffloading.utilities.PayloadConverter;
+
+import java.io.IOException;
+import java.util.HashSet;
 
 public class WorkerActivity extends AppCompatActivity {
-    private String workerId;
-    private String masterId = "";
+    private String masterId;
+    private DeviceInfoBroadcaster deviceStatsPublisher;
     private ClientConnectionListener connectionListener;
-    private DeviceInfoBroadcaster deviceInfoBroadcaster;
-    private Handler handler;
-    private Runnable runnable;
-    private AdvertisingOptions advertisingOptions;
+    private PayloadListener payloadCallback;
+    private int currentPartitionIndex;
+    private HashSet<Integer> finishedWork = new HashSet<>();
+    BatteryManager mBatteryManager = null;
+    Long initialEnergyWorker,finalEnergyWorker,energyConsumedWorker;
 
-    @SuppressLint("HardwareIds")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_worker);
-        this.advertisingOptions = new AdvertisingOptions.Builder().setStrategy(Strategy.P2P_CLUSTER).build();
-        workerId = Settings.Secure.getString(getApplicationContext().getContentResolver(), Settings.Secure.ANDROID_ID);
-        setDeviceId("Device ID: " + workerId);
+        setContentView(R.layout.activity_worker_computation);
+        extractBundle();
+        startDeviceStatsPublisher();
+        setConnectionCallback();
+        connectToMaster();
+        //start measuring the pwer consumption at WorkerBroadcastingActivity
+        mBatteryManager = (BatteryManager)getSystemService(Context.BATTERY_SERVICE);
+        initialEnergyWorker =
+                mBatteryManager.getLongProperty(BatteryManager.BATTERY_PROPERTY_ENERGY_COUNTER);
+        Log.d("WORKER_COMPUTATION", "Capturing power consumption");
+    }
 
-        //Start Advertisement
-        deviceInfoBroadcaster = new DeviceInfoBroadcaster(getApplicationContext(), null, Constants.UPDATE_INTERVAL_UI);
+    public void setStatusText(String text, boolean isWorking) {
+        //UI Textview
+        TextView statusText = findViewById(R.id.statusText);
+        statusText.setText(text);
+    }
 
+    public void onWorkFinished(String text) {
+        //UI Textview
+        TextView statusText = findViewById(R.id.statusText);
+        statusText.setText(text);
+        TextView powerConsumed = findViewById(R.id.powerValue);
+        powerConsumed.setText("Power Consumed : "  + Long.toString(energyConsumedWorker)+ " nWh");
+    }
+
+    private void extractBundle() {
+        Bundle bundle = getIntent().getExtras();
+        this.masterId = bundle.getString(Constants.MASTER_ENDPOINT_ID);
+    }
+
+    private void startDeviceStatsPublisher() {
+        deviceStatsPublisher = new DeviceInfoBroadcaster(getApplicationContext(), masterId, Constants.UPDATE_INTERVAL_UI);
+    }
+
+    private void connectToMaster() {
+        payloadCallback = new PayloadListener() {
+            @Override
+            public void onPayloadReceived(@NonNull String nodeIdString, @NonNull Payload payload) {
+                startWorking(payload);
+            }
+        };
+        NearbySingleton.getInstance(getApplicationContext()).acceptConnection(masterId);
+    }
+
+    private void setConnectionCallback() {
         connectionListener = new ClientConnectionListener() {
             @Override
             public void onConnectionInitiated(String id, ConnectionInfo connectionInfo) {
-                Log.d("WORKER", "Connection Received: " + id + " Endpoint name: " + connectionInfo.getEndpointName());
-                masterId = id;
-                showDialog(connectionInfo.getEndpointName());
             }
 
             @Override
             public void onConnectionResult(String id, ConnectionResolution connectionResolution) {
-                Log.d("WORKER", "Connection Accepted By: " + id + " " + connectionResolution.getStatus());
             }
 
             @Override
             public void onDisconnected(String id) {
-                Log.d("WORKER", "Connection Disconnected: " + id);
-                finish();
+                navBack();
             }
         };
-
-        handler = new Handler(Looper.getMainLooper());
-        runnable = () -> {
-            refreshCardData();
-            handler.postDelayed(runnable, Constants.UPDATE_INTERVAL_UI);
-        };
     }
 
-    void setState(String text) {
-        ((TextView) findViewById(R.id.statusText)).setText(text);
+    private void navBack() {
+        finishedWork = new HashSet<>();
+        finish();
     }
-
-    void setDeviceId(String text) {
-
-    }
-
-    void refreshCardData() {
-        TextView st = findViewById(R.id.percentage);
-        st.setText("Level: " + DeviceInfoBroadcaster.getBatteryLevel(this) + "%");
-        ((TextView)findViewById(R.id.plugged)).setText(String.format("Plugged In: %s", DeviceInfoBroadcaster.isPluggedIn(this) ? "true" : "false"));
-        if (DeviceInfoBroadcaster.getLocation(this) != null) {
-            TextView la = findViewById(R.id.latitude);
-            la.setText(String.format("Latitude: %s", DeviceInfoBroadcaster.getLocation(this).getLatitude()));
-            TextView lo = findViewById(R.id.longitude);
-            lo.setText("Longitude: " + DeviceInfoBroadcaster.getLocation(this).getLongitude());
-        } else {
-            TextView la = findViewById(R.id.latitude);
-            la.setText("Latitude: Not Available");
-            TextView lo = findViewById(R.id.longitude);
-            lo.setText("Longitude: Not Available");
-        }
-    }
-
-    void showDialog(String masterNodeID) {
-        DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
-            switch (which){
-                case DialogInterface.BUTTON_POSITIVE:
-                    NearbySingleton.getInstance(getApplicationContext()).acceptConnection(masterId);
-                    startWorkerComputation();
-                    break;
-
-                case DialogInterface.BUTTON_NEGATIVE:
-                    NearbySingleton.getInstance(getApplicationContext()).rejectConnection(masterId);
-                    break;
-            }
-        };
-        AlertDialog.Builder builder = new AlertDialog.Builder(WorkerActivity.this);
-        builder.setMessage("Do you want to pair with master node" + masterNodeID +"?")
-                .setPositiveButton("Yes", dialogClickListener)
-                .setNegativeButton("No", dialogClickListener).show();
-    }
-
-
 
     @Override
     protected void onResume() {
-        setState("Initializing...");
         super.onResume();
-        NearbySingleton.getInstance(getApplicationContext()).advertise(workerId, advertisingOptions).addOnSuccessListener(command -> {
-            Log.d("WORKER", "Discoverable by all devices");
-            setState("Discoverable by all devices");
-        }).addOnFailureListener(c -> {
-            if (((ApiException) c).getStatusCode() == 8001) {
-                Log.d("WORKER", "Discoverable by all devices");
-                setState("Discoverable by all devices");
-            } else {
-                setState("Failed to host device");
-            }
-        });
+        NearbySingleton.getInstance(getApplicationContext()).registerPayloadListener(payloadCallback);
         NearbySingleton.getInstance(getApplicationContext()).registerClientConnectionListener(connectionListener);
-        Log.d("WORKER", "Starting Device Stats");
-        deviceInfoBroadcaster.start();
-        handler.postDelayed(runnable, Constants.UPDATE_INTERVAL_UI);
+        deviceStatsPublisher.start();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        NearbySingleton.getInstance(getApplicationContext()).unregisterPayloadListener(payloadCallback);
         NearbySingleton.getInstance(getApplicationContext()).unregisterClientConnectionListener(connectionListener);
-        Log.d("WORKER", "Stopping Device Stats");
-        deviceInfoBroadcaster.stop();
-        handler.removeCallbacks(runnable);
-    }
-
-    private void startWorkerComputation() {
-        Intent intent = new Intent(getApplicationContext(), Worker_Computation.class);
-        Bundle bundle = new Bundle();
-        bundle.putString(Constants.MASTER_ENDPOINT_ID, masterId);
-        intent.putExtras(bundle);
-        startActivity(intent);
-        Nearby.getConnectionsClient(getApplicationContext()).stopAdvertising();
-        Log.d("WORKER", "Device is not discoverable");
-        finish();
+        deviceStatsPublisher.stop();
     }
 
     @Override
-    public void onBackPressed() {
-        Nearby.getConnectionsClient(getApplicationContext()).stopAdvertising();
-        Log.d("WORKER", "Device is not discoverable");
-        if (!masterId.equals("")) {
-            NearbySingleton.getInstance(getApplicationContext()).disconnectFromEndpoint(masterId);
-            NearbySingleton.getInstance(getApplicationContext()).rejectConnection(masterId);
-        }
-        finish();
-        super.onBackPressed();
+    public void finish() {
+        super.finish();
+        NearbySingleton.getInstance(getApplicationContext()).disconnectFromEndpoint(masterId);
+        currentPartitionIndex = 0;
     }
+
+
+    public void onDisconnect(View view) {
+        WorkInfo workStatus = new WorkInfo();
+        workStatus.setPartitionIndexInfo(currentPartitionIndex);
+        workStatus.setStatusInfo(Constants.WorkStatus.DISCONNECTED);
+
+        ClientPayLoad tPayload1 = new ClientPayLoad();
+        tPayload1.setTag(Constants.PayloadTags.WORK_STATUS);
+        tPayload1.setData(workStatus);
+
+        DataTransfer.sendPayload(getApplicationContext(), masterId, tPayload1);
+        navBack();
+    }
+
+    public void startWorking(Payload payload) {
+        WorkInfo workStatus = new WorkInfo();
+        ClientPayLoad sendPayload = new ClientPayLoad();
+        sendPayload.setTag(Constants.PayloadTags.WORK_STATUS);
+
+        try {
+            ClientPayLoad receivedPayload = PayloadConverter.fromPayload(payload);
+            if (receivedPayload.getTag().equals(Constants.PayloadTags.WORK_DATA)) {
+                setStatusText("Work status: Computing", true);
+
+                WorkData workData = (WorkData) receivedPayload.getData();
+                int dotProduct = calculateDotProduct(workData.getRows(), workData.getCols());
+
+                Log.d("WORKER_COMPUTATION", "Partition Index: " + workData.getPartitionIndex());
+                if (!finishedWork.contains(workData.getPartitionIndex())) {
+                    finishedWork.add(workData.getPartitionIndex());
+                }
+                currentPartitionIndex = workData.getPartitionIndex();
+
+                workStatus.setPartitionIndexInfo(workData.getPartitionIndex());
+                workStatus.setResultInfo(dotProduct);
+
+                workStatus.setStatusInfo(Constants.WorkStatus.WORKING);
+                sendPayload.setData(workStatus);
+                DataTransfer.sendPayload(getApplicationContext(), masterId, sendPayload);
+
+            } else if (receivedPayload.getTag().equals(Constants.PayloadTags.FAREWELL)) {
+                // end measuring energy level
+                finalEnergyWorker =
+                        mBatteryManager.getLongProperty(BatteryManager.BATTERY_PROPERTY_ENERGY_COUNTER);
+                energyConsumedWorker = Math.abs(initialEnergyWorker-finalEnergyWorker);
+                onWorkFinished("Work Done !!");
+                Log.d("WORKER_COMPUTATION", "Work Done");
+                workStatus.setStatusInfo(Constants.WorkStatus.FINISHED);
+                sendPayload.setData(workStatus);
+                DataTransfer.sendPayload(getApplicationContext(), masterId, sendPayload);
+                deviceStatsPublisher.stop();
+
+            } else if (receivedPayload.getTag().equals(Constants.PayloadTags.DISCONNECTED)) {
+                navBack();
+            }
+
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public int calculateDotProduct(int[] a, int[] b){
+        int product = 0;
+        for(int i = 0 ; i < a.length; i++){
+            product +=  (a[i] * b[i]);
+        }
+        return product;
+    }
+
 }
+

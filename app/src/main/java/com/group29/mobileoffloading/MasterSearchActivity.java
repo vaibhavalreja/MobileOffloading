@@ -41,7 +41,7 @@ import com.group29.mobileoffloading.utilities.PayloadConverter;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class Master_Discovery extends AppCompatActivity {
+public class MasterSearchActivity extends AppCompatActivity {
 
     private RecyclerView available_workers_rv;
     private AvailableWorkersAdapter availableWorkersAdapter;
@@ -96,12 +96,6 @@ public class Master_Discovery extends AppCompatActivity {
                 } catch (IOException | ClassNotFoundException e) {
                     e.printStackTrace();
                 }
-            }
-
-
-            @Override
-            public void onPayloadTransferUpdate(String nodeIdString, PayloadTransferUpdate payloadTransferUpdate) {
-                Log.d("MASTER_DISCOVERY", "PayloadListener -  onPayloadTransferUpdate");
             }
         };
 
@@ -160,7 +154,7 @@ public class Master_Discovery extends AppCompatActivity {
         ArrayList<AvailableWorker> res = new ArrayList<>();
         for (int i = 0; i < availableWorkerDevices.size(); i++) {
             if (availableWorkerDevices.get(i).getRequestStatus().equals(Constants.RequestStatus.ACCEPTED)) {
-                if (availableWorkerDevices.get(i).getDeviceStats().getBatteryLevel() > WorkAllocator.ThresholdsHolder.MINIMUM_BATTERY_LEVEL) {
+                if (availableWorkerDevices.get(i).getDeviceStats().getBatteryPercentage() > WorkAllocator.ThresholdsHolder.MINIMUM_BATTERY_LEVEL) {
                     res.add(availableWorkerDevices.get(i));
                 } else {
                     ClientPayLoad tPayload = new ClientPayLoad();
@@ -204,7 +198,7 @@ public class Master_Discovery extends AppCompatActivity {
                 availableWorker.setEndpointId(nodeIdString);
                 availableWorker.setEndpointName(discoveredEndpointInfo.getEndpointName());
                 availableWorker.setRequestStatus(Constants.RequestStatus.PENDING);
-                availableWorker.setDeviceStats(new DeviceInfo());
+                availableWorker.setDeviceStats(new DeviceInfo(0,false,0.0,0.0));
 
                 availableWorkerDevices.add(availableWorker);
                 availableWorkersAdapter.notifyItemChanged(availableWorkerDevices.size() - 1);
@@ -276,7 +270,7 @@ public class Master_Discovery extends AppCompatActivity {
 
     void canAssign(DeviceInfo deviceStats) {
         Button assignButton = findViewById(R.id.assignTask);
-        assignButton.setEnabled(deviceStats.getBatteryLevel() > WorkAllocator.ThresholdsHolder.MINIMUM_BATTERY_LEVEL);
+        assignButton.setEnabled(deviceStats.getBatteryPercentage() > WorkAllocator.ThresholdsHolder.MINIMUM_BATTERY_LEVEL);
     }
 
     void setState(String text) {
