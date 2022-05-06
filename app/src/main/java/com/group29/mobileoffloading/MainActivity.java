@@ -96,7 +96,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
         selectedRole  = (String) adapterView.getItemAtPosition(i);
-        Log.d("ROLE", selectedRole+i);
+
     }
 
     @Override

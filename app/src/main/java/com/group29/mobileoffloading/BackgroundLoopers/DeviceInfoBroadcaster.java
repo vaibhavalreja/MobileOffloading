@@ -7,9 +7,8 @@ import android.location.Location;
 import android.os.BatteryManager;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
 
-import com.group29.mobileoffloading.DataModels.ClientPayLoad;
+import com.group29.mobileoffloading.DataModels.NodeDataPayload;
 import com.group29.mobileoffloading.DataModels.DeviceInfo;
 import com.group29.mobileoffloading.Helpers.FusedLocationHelper;
 import com.group29.mobileoffloading.utilities.DataPacketStringKeys;
@@ -27,22 +26,22 @@ public class DeviceInfoBroadcaster {
         this.nodeIdString = nodeIdString;
         handler = new Handler(Looper.getMainLooper());
         runnable = () -> {
-            publish();
+            Broadcast();
             handler.postDelayed(runnable, 7000);
         };
     }
 
-    public static void publish(Context context, String nodeIdString) {
+    public static void Broadcast(Context context, String nodeIdString) {
         DeviceInfo deviceInfo = new DeviceInfo(getBatteryLevel(context),
                 isPluggedIn(context),
                 getLocation(context).getLatitude(),
                 getLocation(context).getLongitude()
         );
         if (nodeIdString != null) {
-            ClientPayLoad payload = new ClientPayLoad().setTag(DataPacketStringKeys.DEVICE_STATS).setData(deviceInfo);
+            NodeDataPayload payload = new NodeDataPayload().setTag(DataPacketStringKeys.DEVICE_STATS).setData(deviceInfo);
             DataTransfer.sendPayload(context, nodeIdString, payload);
         }
-        Log.d("DEVICE_STATS", "DEVICE STATUS B: " + deviceInfo.getBatteryPercentage() + " P: " + deviceInfo.isCharging() + " L: " + deviceInfo.getLatitude() + " " + deviceInfo.getLongitude());
+        
     }
 
     public static Location getLocation(Context context) {
@@ -65,18 +64,19 @@ public class DeviceInfoBroadcaster {
         return b;
     }
 
-    public void start() {
-        handler.postDelayed(runnable, 7000);
+    public void begin() {
         FusedLocationHelper.getInstance(context).start(7000);
+        handler.postDelayed(runnable, 7000);
+
     }
 
-    public void stop() {
-        handler.removeCallbacks(runnable);
+    public void destroy() {
         FusedLocationHelper.getInstance(context).stop();
+        handler.removeCallbacks(runnable);
     }
 
-    private void publish() {
-        DeviceInfoBroadcaster.publish(this.context, this.nodeIdString);
+    private void Broadcast() {
+        DeviceInfoBroadcaster.Broadcast(this.context, this.nodeIdString);
     }
 
 }

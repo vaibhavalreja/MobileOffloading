@@ -22,7 +22,7 @@ public class FlushToFile {
                 fileWriter.close();
             } catch (IOException e) {
                 e.printStackTrace();
-                Log.d("FLUSHTOFILE", "Writing to file failed.");
+                
             }
         });
     }

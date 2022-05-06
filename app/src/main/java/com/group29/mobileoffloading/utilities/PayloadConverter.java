@@ -1,7 +1,7 @@
 package com.group29.mobileoffloading.utilities;
 
 import com.google.android.gms.nearby.connection.Payload;
-import com.group29.mobileoffloading.DataModels.ClientPayLoad;
+import com.group29.mobileoffloading.DataModels.NodeDataPayload;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -10,7 +10,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 public class PayloadConverter {
-    public static Payload toPayload(ClientPayLoad tPayload) throws IOException {
+    public static Payload toPayload(NodeDataPayload tPayload) throws IOException {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
         ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
@@ -23,12 +23,12 @@ public class PayloadConverter {
         return payload;
     }
 
-    public static ClientPayLoad fromPayload(Payload payload) throws IOException, ClassNotFoundException {
+    public static NodeDataPayload fromPayload(Payload payload) throws IOException, ClassNotFoundException {
         byte[] receivedBytes = payload.asBytes();
 
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(receivedBytes);
         ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
 
-        return (ClientPayLoad) objectInputStream.readObject();
+        return (NodeDataPayload) objectInputStream.readObject();
     }
 }

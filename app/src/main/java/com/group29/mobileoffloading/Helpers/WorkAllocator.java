@@ -6,14 +6,13 @@ import static com.group29.mobileoffloading.stateVariables.WorkerStateVariables.W
 
 import android.content.Context;
 import android.os.Handler;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.gms.nearby.connection.Payload;
-import com.group29.mobileoffloading.BackgroundLoopers.Connector;
-import com.group29.mobileoffloading.DataModels.ClientPayLoad;
+import com.group29.mobileoffloading.BackgroundLoopers.DataInterface;
+import com.group29.mobileoffloading.DataModels.NodeDataPayload;
 import com.group29.mobileoffloading.DataModels.WorkData;
-import com.group29.mobileoffloading.DataModels.WorkInfo;
+import com.group29.mobileoffloading.DataModels.WorkDataforWorker;
 import com.group29.mobileoffloading.DataModels.Worker;
 import com.group29.mobileoffloading.listeners.ComputationListener;
 import com.group29.mobileoffloading.stateVariables.WorkerStateVariables;
@@ -142,13 +141,12 @@ public class WorkAllocator {
             workData.setRows(rows);
             workData.setCols(cols);
 
-            ClientPayLoad payload = new ClientPayLoad();
+            NodeDataPayload payload = new NodeDataPayload();
             payload.setTag(DataPacketStringKeys.WORK_DATA);
             payload.setData(workData);
             try {
-                //TODO find out communication here : Done
                 Payload payload1 = PayloadConverter.toPayload(payload);
-                Connector.sendToDevice(context, worker.getEndpointId(), payload1);
+                DataInterface.sendToDevice(context, worker.getEndpointId(), payload1);
 
             } catch (Exception e) { //IOException e
                 if (!isAnyWrokerRunning(worker)) {
@@ -161,11 +159,6 @@ public class WorkAllocator {
             }
 
         }
-    }
-
-    public void setNewWorkers(ArrayList<Worker> workers) {
-        this.workers.clear();
-        this.workers.addAll(workers);
     }
 
     public void removeWorker(String nodeIdString) {
@@ -182,7 +175,6 @@ public class WorkAllocator {
     }
 
     private boolean isAnyWrokerRunning(Worker worker) {
-        /* Check if the worker is in workers list */
 
         for (int i = 0; i < workers.size(); i++) {
             if (worker.getEndpointId().equals(workers.get(i).getEndpointId())) {
@@ -193,7 +185,7 @@ public class WorkAllocator {
     }
 
     public void checkWorkCompletion(int workAmount) {
-        Log.d("Checking", "totalpartitions :" + totalpartitions + " partitionResults.size() " + partitionResults.size());
+        
         if (workAmount == totalpartitions) {
             sendByeToWorkers();
         } else if (partitionResults.size() == totalpartitions) {
@@ -201,23 +193,23 @@ public class WorkAllocator {
         }
     }
 
-    public void updateWorkStatus(Worker worker, WorkInfo workInfo) {
+    public void updateWorkStatus(Worker worker, WorkDataforWorker workDataforWorker) {
         if (partitionResults.size() == totalpartitions) {
             return; //finished all work :)
         }
-        if (worker == null || workInfo == null) {
+        if (worker == null || workDataforWorker == null) {
             return; // initialization is not done yet
         }
 
-        if (workInfo.getStatusInfo().equals(WORKING)) {
-            partitionResults.put(workInfo.getPartitionIndexInfo(), workInfo.getResultInfo());
+        if (workDataforWorker.getStatusInfo().equals(WORKING)) {
+            partitionResults.put(workDataforWorker.getPartitionIndexInfo(), workDataforWorker.getResultInfo());
         }
 
-        if (workInfo.getStatusInfo().equals(FAILED) || workInfo.getStatusInfo().equals(WorkerStateVariables.DISCONNECTED)) {
-            addWorkToQueue(workInfo.getPartitionIndexInfo());
+        if (workDataforWorker.getStatusInfo().equals(FAILED) || workDataforWorker.getStatusInfo().equals(WorkerStateVariables.DISCONNECTED)) {
+            addWorkToQueue(workDataforWorker.getPartitionIndexInfo());
         }
 
-        if (!workInfo.getStatusInfo().equals(DISCONNECTED)) {
+        if (!workDataforWorker.getStatusInfo().equals(DISCONNECTED)) {
             addWorkersToQueue(worker);
         }
 
@@ -238,10 +230,10 @@ public class WorkAllocator {
 
         for (Worker worker : workers) {
             if (!worker.getWorkStatus().getStatusInfo().equals(WorkerStateVariables.DISCONNECTED)) {
-                ClientPayLoad payload = new ClientPayLoad();
+                NodeDataPayload payload = new NodeDataPayload();
                 payload.setTag(DataPacketStringKeys.FAREWELL);
 
-                Connector.sendToDevice(context, worker.getEndpointId(), payload);
+                DataInterface.sendToDevice(context, worker.getEndpointId(), payload);
                 NearbySingleton.getInstance(context).rejectConnection(worker.getEndpointId());
             }
         }

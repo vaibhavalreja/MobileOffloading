@@ -5,7 +5,6 @@ import android.location.Location;
 import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,7 +17,7 @@ import com.group29.mobileoffloading.BackgroundLoopers.WorkerListener;
 import com.group29.mobileoffloading.CustomListAdapters.WorkingWorkersAdapter;
 import com.group29.mobileoffloading.DataModels.AvailableWorker;
 import com.group29.mobileoffloading.DataModels.DeviceInfo;
-import com.group29.mobileoffloading.DataModels.WorkInfo;
+import com.group29.mobileoffloading.DataModels.WorkDataforWorker;
 import com.group29.mobileoffloading.DataModels.Worker;
 import com.group29.mobileoffloading.Helpers.NearbySingleton;
 import com.group29.mobileoffloading.Helpers.WorkAllocator;
@@ -58,7 +57,7 @@ public class Master extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_master);
 
-        Log.d("MasterDiscovery", "Starting computing matrix multiplication on only master");
+        
         TextView power_consumed_master_tv = findViewById(R.id.power_consumed_master_tv);
         power_consumed_master_tv.setText("Power Consumption for Master Node: null");
         BatteryManager mBatteryManager =
@@ -70,7 +69,7 @@ public class Master extends AppCompatActivity {
                 mBatteryManager.getLongProperty(BatteryManager.BATTERY_PROPERTY_ENERGY_COUNTER);
         Long energyConsumedMaster = Math.abs(initialEnergyMaster - finalEnergyMaster);
         power_consumed_master_tv.setText("Power Consumption for Master Node: " + energyConsumedMaster + " nWh");
-        Log.d("MasterDiscovery", "Completed computing matrix multiplication on only master");
+        
 
         unpackBundle();
         bindViews();
@@ -84,7 +83,7 @@ public class Master extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         stopWorkerStatusSubscribers();
-        deviceInfoBroadcaster.stop();
+        deviceInfoBroadcaster.destroy();
         handler.removeCallbacks(runnable);
     }
 
@@ -92,7 +91,7 @@ public class Master extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         startWorkerStatusSubscribers();
-        deviceInfoBroadcaster.start();
+        deviceInfoBroadcaster.begin();
         handler.postDelayed(runnable, 7000);
     }
 
@@ -157,7 +156,7 @@ public class Master extends AppCompatActivity {
 
             ArrayList<AvailableWorker> availableWorkers = (ArrayList<AvailableWorker>) bundle.getSerializable(AVAILABLE_DEVICES_LIST_BUNDLE_KEY);
             addToWorkers(availableWorkers);
-            Log.d("CHECK", "Added a connected Device as worker");
+            
         } catch (NullPointerException e) {
             e.printStackTrace();
         }
@@ -169,7 +168,7 @@ public class Master extends AppCompatActivity {
             worker.setEndpointId(availableWorker.getEndpointId());
             worker.setEndpointName(availableWorker.getEndpointName());
 
-            WorkInfo workStatus = new WorkInfo();
+            WorkDataforWorker workStatus = new WorkDataforWorker();
             workStatus.setStatusInfo(WorkerStateVariables.WORKING);
 
             worker.setWorkStatus(workStatus);
@@ -215,10 +214,10 @@ public class Master extends AppCompatActivity {
 
 
     private void updateWorkerConnectionStatus(String nodeIdString, String status) {
-        Log.d("DISCONNECTED----", nodeIdString);
+        
         for (int i = 0; i < workers.size(); i++) {
 
-            Log.d("DISCONNECTED--", workers.get(i).getEndpointId());
+            
             if (workers.get(i).getEndpointId().equals(nodeIdString)) {
                 workers.get(i).getWorkStatus().setStatusInfo(status);
                 workingWorkersAdapter.notifyDataSetChanged();
@@ -236,7 +235,7 @@ public class Master extends AppCompatActivity {
 
             WorkerListener workerListener = new WorkerListener(getApplicationContext(), worker.getEndpointId(), new WorkerStatusListener() {
                 @Override
-                public void onWorkStatusReceived(String nodeIdString, WorkInfo workStatus) {
+                public void onWorkStatusReceived(String nodeIdString, WorkDataforWorker workStatus) {
 
                     if (workStatus.getStatusInfo().equals(WorkerStateVariables.DISCONNECTED)) {
                         updateWorkerConnectionStatus(nodeIdString, WorkerStateVariables.DISCONNECTED);
@@ -257,7 +256,7 @@ public class Master extends AppCompatActivity {
                             + "\t\t" + deviceStats.getLatitude()
                             + "\t" + deviceStats.getLongitude();
                     FlushToFile.writeTextToFile(getApplicationContext(), nodeIdString + ".txt", true, deviceStatsStr);
-                    Log.d("MASTER_ACTIVITY", "WORK AMOUNT: " + getWorkAmount());
+                    
                     workAllocator.checkWorkCompletion(getWorkAmount());
                 }
             });
@@ -277,7 +276,7 @@ public class Master extends AppCompatActivity {
         return sum;
     }
 
-    private void updateWorkerStatus(String nodeIdString, WorkInfo workStatus) {
+    private void updateWorkerStatus(String nodeIdString, WorkDataforWorker workStatus) {
         for (int i = 0; i < workers.size(); i++) {
             Worker worker = workers.get(i);
 
@@ -309,8 +308,8 @@ public class Master extends AppCompatActivity {
                     float[] results = new float[1];
                     Location.distanceBetween(masterLocation.getLatitude(), masterLocation.getLongitude(),
                             deviceStats.getLatitude(), deviceStats.getLongitude(), results);
-                    Log.d("MASTER_ACTIVITY", "Master Location: " + masterLocation.getLatitude() + ", " + masterLocation.getLongitude());
-                    Log.d("MASTER_ACTIVITY", "Master Distance: " + results[0]);
+                    
+                    
                     worker.setDistanceFromMaster(results[0]);
                 }
 

@@ -17,7 +17,7 @@ import com.google.android.gms.nearby.connection.PayloadCallback;
 import com.google.android.gms.nearby.connection.PayloadTransferUpdate;
 import com.google.android.gms.tasks.Task;
 import com.group29.mobileoffloading.listeners.ClientConnectionListener;
-import com.group29.mobileoffloading.listeners.PayloadListener;
+import com.group29.mobileoffloading.listeners.NodeDataListener;
 
 import java.util.HashSet;
 
@@ -30,7 +30,7 @@ public class NearbySingleton {
     private final ConnectionLifecycleCallback connectionLifecycleCallback;
     private final HashSet<ClientConnectionListener> clientConnectionListenerSet = new HashSet<>();
 
-    private final HashSet<PayloadListener> payloadListenersSet = new HashSet<>();
+    private final HashSet<NodeDataListener> nodeDataListenersSet = new HashSet<>();
 
     public NearbySingleton(Context context) {
         this.context = context;
@@ -83,10 +83,10 @@ public class NearbySingleton {
         Nearby.getConnectionsClient(context)
                 .requestConnection(clientId, nodeIdString, connectionLifecycleCallback)
                 .addOnSuccessListener(unused -> {
-                    Log.d("NEARBYCONNCTNMGR", "CONNECTION REQUESTED");
+                    
                 })
                 .addOnFailureListener((Exception e) -> {
-                    Log.d("NEARBYCONNCTNMGR", "CONNECTION FAILED");
+                    
                     e.printStackTrace();
                 });
     }
@@ -95,9 +95,9 @@ public class NearbySingleton {
         Nearby.getConnectionsClient(context).acceptConnection(nodeIdString, new PayloadCallback() {
             @Override
             public void onPayloadReceived(@NonNull String nodeIdString, @NonNull Payload payload) {
-                for (PayloadListener payloadListener : payloadListenersSet) {
+                for (NodeDataListener nodeDataListener : nodeDataListenersSet) {
                     try {
-                        payloadListener.onPayloadReceived(nodeIdString, payload);
+                        nodeDataListener.onDataReceived(nodeIdString, payload);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -125,9 +125,9 @@ public class NearbySingleton {
                 .addOnFailureListener(Throwable::printStackTrace);
     }
 
-    public void registerPayloadListener(PayloadListener payloadListener) {
-        if (payloadListener != null) {
-            payloadListenersSet.add(payloadListener);
+    public void registerPayloadListener(NodeDataListener nodeDataListener) {
+        if (nodeDataListener != null) {
+            nodeDataListenersSet.add(nodeDataListener);
         }
     }
 
@@ -137,9 +137,9 @@ public class NearbySingleton {
         }
     }
 
-    public void unregisterPayloadListener(PayloadListener payloadListener) {
-        if (payloadListener != null) {
-            payloadListenersSet.remove(payloadListener);
+    public void unregisterPayloadListener(NodeDataListener nodeDataListener) {
+        if (nodeDataListener != null) {
+            nodeDataListenersSet.remove(nodeDataListener);
         }
     }
 

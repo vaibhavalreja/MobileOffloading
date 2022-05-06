@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -25,15 +24,15 @@ import com.google.android.gms.nearby.connection.DiscoveryOptions;
 import com.google.android.gms.nearby.connection.EndpointDiscoveryCallback;
 import com.google.android.gms.nearby.connection.Payload;
 import com.google.android.gms.nearby.connection.Strategy;
-import com.group29.mobileoffloading.BackgroundLoopers.Connector;
+import com.group29.mobileoffloading.BackgroundLoopers.DataInterface;
 import com.group29.mobileoffloading.CustomListAdapters.AvailableWorkersAdapter;
 import com.group29.mobileoffloading.DataModels.AvailableWorker;
-import com.group29.mobileoffloading.DataModels.ClientPayLoad;
+import com.group29.mobileoffloading.DataModels.NodeDataPayload;
 import com.group29.mobileoffloading.DataModels.DeviceInfo;
 import com.group29.mobileoffloading.Helpers.NearbySingleton;
 import com.group29.mobileoffloading.Helpers.WorkAllocator;
 import com.group29.mobileoffloading.listeners.ClientConnectionListener;
-import com.group29.mobileoffloading.listeners.PayloadListener;
+import com.group29.mobileoffloading.listeners.NodeDataListener;
 import com.group29.mobileoffloading.utilities.DataPacketStringKeys;
 import com.group29.mobileoffloading.utilities.PayloadConverter;
 
@@ -50,7 +49,7 @@ public class MasterSearchActivity extends AppCompatActivity {
     private RecyclerView available_workers_rv;
     private AvailableWorkersAdapter availableWorkersAdapter;
     private ClientConnectionListener clientConnectionListener;
-    private PayloadListener payloadListener;
+    private NodeDataListener nodeDataListener;
     private DiscoveryOptions discoveryOptions;
     private String masterNodeId;
 
@@ -59,7 +58,7 @@ public class MasterSearchActivity extends AppCompatActivity {
         super.onPause();
         setState("Not searching");
         Nearby.getConnectionsClient(getApplicationContext()).stopDiscovery();
-        NearbySingleton.getInstance(getApplicationContext()).unregisterPayloadListener(payloadListener);
+        NearbySingleton.getInstance(getApplicationContext()).unregisterPayloadListener(nodeDataListener);
         NearbySingleton.getInstance(getApplicationContext()).unregisterClientConnectionListener(clientConnectionListener);
     }
 
@@ -67,7 +66,7 @@ public class MasterSearchActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         startMasterDiscovery();
-        NearbySingleton.getInstance(getApplicationContext()).registerPayloadListener(payloadListener);
+        NearbySingleton.getInstance(getApplicationContext()).registerPayloadListener(nodeDataListener);
         NearbySingleton.getInstance(getApplicationContext()).registerClientConnectionListener(clientConnectionListener);
     }
 
@@ -84,11 +83,11 @@ public class MasterSearchActivity extends AppCompatActivity {
             public void onClick(View view) {
                 ArrayList<AvailableWorker> readyDevices = getDevicesInReadyState();
                 if (readyDevices.size() == 0) {
-                    Log.d("TEST", "no devices");
+                    
                     Toast.makeText(getApplicationContext(), "No worker Available at the moment", Toast.LENGTH_LONG).show();
                     onBackPressed();
                 } else {
-                    Log.d("TEST", "herer");
+                    
                     Nearby.getConnectionsClient(getApplicationContext()).stopDiscovery();
                     startMasterActivity(readyDevices);
                     finish();
@@ -103,12 +102,12 @@ public class MasterSearchActivity extends AppCompatActivity {
         available_workers_rv.setAdapter(availableWorkersAdapter);
         availableWorkersAdapter.notifyDataSetChanged();
 
-        payloadListener = new PayloadListener() {
+        nodeDataListener = new NodeDataListener() {
             @Override
-            public void onPayloadReceived(String nodeIdString, Payload payload) {
-                Log.d("MASTER_DISCOVERY", "PayloadListener -  onPayloadReceived");
+            public void onDataReceived(String nodeIdString, Payload payload) {
+                
                 try {
-                    ClientPayLoad tPayload = PayloadConverter.fromPayload(payload);
+                    NodeDataPayload tPayload = PayloadConverter.fromPayload(payload);
                     if (tPayload.getTag().equals(DataPacketStringKeys.DEVICE_STATS)) {
                         updateDeviceStats(nodeIdString, (DeviceInfo) tPayload.getData());
                     }
@@ -122,31 +121,31 @@ public class MasterSearchActivity extends AppCompatActivity {
         clientConnectionListener = new ClientConnectionListener() {
             @Override
             public void onConnectionInitiated(String nodeIdString, ConnectionInfo connectionInfo) {
-                Log.d("MASTER_DISCOVERY", "clientConnectionListener -  onConnectionInitiated");
+                
                 NearbySingleton.getInstance(getApplicationContext()).acceptConnection(nodeIdString);
             }
 
             @Override
             public void onConnectionResult(String nodeIdString, ConnectionResolution connectionResolution) {
 
-                Log.d("MASTER_DISCOVERY", "clientConnectionListener -  onConnectionResult" + nodeIdString);
+                
 
                 int statusCode = connectionResolution.getStatus().getStatusCode();
                 if (statusCode == ConnectionsStatusCodes.STATUS_OK) {
-                    Log.d("MASTER_DISCOVERY", "clientConnectionListener -  onConnectionResult - ACCEPTED");
+                    
                     updateConnectedDeviceRequestStatus(nodeIdString, REQUEST_STATE_ACCEPTED);
                 } else if (statusCode == ConnectionsStatusCodes.STATUS_CONNECTION_REJECTED) {
-                    Log.d("MASTER_DISCOVERY", "clientConnectionListener -  onConnectionResult - REJECTED");
+                    
                     updateConnectedDeviceRequestStatus(nodeIdString, REQUEST_STATE_REJECTED);
                 } else if (statusCode == ConnectionsStatusCodes.STATUS_ERROR) {
-                    Log.d("MASTER_DISCOVERY", "clientConnectionListener -  onConnectionResult - ERROR");
+                    
                     removeConnectedDevice(nodeIdString, true);
                 }
             }
 
             @Override
             public void onDisconnected(String nodeIdString) {
-                Log.d("MASTER_DISCOVERY", "clientConnectionListener -  onDisconnected " + nodeIdString);
+                
                 removeConnectedDevice(nodeIdString, true);
             }
         };
@@ -161,17 +160,17 @@ public class MasterSearchActivity extends AppCompatActivity {
                 if (availableWorkerDevices.get(i).getDeviceStats().getBatteryPercentage() > WorkAllocator.ThresholdsHolder.MINIMUM_BATTERY_LEVEL) {
                     res.add(availableWorkerDevices.get(i));
                 } else {
-                    ClientPayLoad tPayload = new ClientPayLoad();
+                    NodeDataPayload tPayload = new NodeDataPayload();
                     tPayload.setTag(DataPacketStringKeys.DISCONNECTED);
 
-                    Connector.sendToDevice(getApplicationContext(), availableWorkerDevices.get(i).getEndpointId(), tPayload);
+                    DataInterface.sendToDevice(getApplicationContext(), availableWorkerDevices.get(i).getEndpointId(), tPayload);
                 }
             } else {
-                Log.d("MASTER_DISCOVERY", "LOOPING");
-                ClientPayLoad tPayload = new ClientPayLoad();
+                
+                NodeDataPayload tPayload = new NodeDataPayload();
                 tPayload.setTag(DataPacketStringKeys.DISCONNECTED);
 
-                Connector.sendToDevice(getApplicationContext(), availableWorkerDevices.get(i).getEndpointId(), tPayload);
+                DataInterface.sendToDevice(getApplicationContext(), availableWorkerDevices.get(i).getEndpointId(), tPayload);
             }
 
         }
@@ -182,7 +181,7 @@ public class MasterSearchActivity extends AppCompatActivity {
         for (int i = 0; i < availableWorkerDevices.size(); i++) {
             if (availableWorkerDevices.get(i).getEndpointId().equals(nodeIdString)) {
                 availableWorkerDevices.get(i).setRequestStatus(status);
-                Log.d("MASTER_DISCOVERY", "Status of end point set to " + status);
+                
                 availableWorkersAdapter.notifyItemChanged(i);
                 break;
             }
@@ -190,13 +189,13 @@ public class MasterSearchActivity extends AppCompatActivity {
     }
 
     private void startMasterDiscovery() {
-        Log.d("MASTER_DISCOVERY", "Starting Master Discovery");
+        
         EndpointDiscoveryCallback endpointDiscoveryCallback = new EndpointDiscoveryCallback() {
             @Override
             public void onEndpointFound(@NonNull String nodeIdString, @NonNull DiscoveredEndpointInfo discoveredEndpointInfo) {
-                Log.d("MASTER_DISCOVERY", "ENDPOINT FOUND " + nodeIdString);
-                Log.d("MASTER_DISCOVERY", nodeIdString);
-                Log.d("MASTER_DISCOVERY", discoveredEndpointInfo.getServiceId() + " " + discoveredEndpointInfo.getEndpointName());
+                
+                
+                
 
                 AvailableWorker availableWorker = new AvailableWorker();
                 availableWorker.setEndpointId(nodeIdString);
@@ -207,17 +206,17 @@ public class MasterSearchActivity extends AppCompatActivity {
                 availableWorkerDevices.add(availableWorker);
                 availableWorkersAdapter.notifyItemChanged(availableWorkerDevices.size() - 1);
 
-                Log.d("MASTER_DISCOVERY", "Added end point to connected devices : " + nodeIdString);
+                
 
                 NearbySingleton.getInstance(getApplicationContext()).requestConnection(nodeIdString, masterNodeId);
-                Log.d("MASTER_DISCOVERY", "Requested connection for : " + nodeIdString);
+                
 
             }
 
             @Override
             public void onEndpointLost(@NonNull String nodeIdString) {
-                Log.d("MASTER_DISCOVERY", "ENDPOINT LOST");
-                Log.d("MASTER_DISCOVERY", nodeIdString);
+                
+                
                 removeConnectedDevice(nodeIdString, false);
             }
         };
@@ -225,10 +224,10 @@ public class MasterSearchActivity extends AppCompatActivity {
         Nearby.getConnectionsClient(getApplicationContext())
                 .startDiscovery(getPackageName(), endpointDiscoveryCallback, discoveryOptions)
                 .addOnSuccessListener((unused) -> {
-                    Log.d("MASTER", "DISCOVERY IN PROGRESS");
+                    
                 })
                 .addOnFailureListener((Exception e) -> {
-                    Log.d("MASTER", "DISCOVERING FAILED");
+                    
                     e.printStackTrace();
                 })
                 .addOnSuccessListener((unused) -> {
@@ -239,7 +238,7 @@ public class MasterSearchActivity extends AppCompatActivity {
                         setState("Finding");
                     } else {
                         setState("Error - try to enable location");
-                        Log.d("TEST", "discovery failed");
+                        
                         finish();
                     }
                     command.printStackTrace();
@@ -251,7 +250,7 @@ public class MasterSearchActivity extends AppCompatActivity {
         for (int i = 0; i < availableWorkerDevices.size(); i++) {
             boolean checkStatus = forceRemove || !availableWorkerDevices.get(i).getRequestStatus().equals(REQUEST_STATE_ACCEPTED);
             if (availableWorkerDevices.get(i).getEndpointId().equals(nodeIdString) && checkStatus) {
-                Log.d("MASTER_DISCOVERY", "Removed end point from connected devices " + nodeIdString);
+                
                 availableWorkerDevices.remove(i);
                 availableWorkersAdapter.notifyItemChanged(i);
                 break;
@@ -298,7 +297,7 @@ public class MasterSearchActivity extends AppCompatActivity {
         Bundle bundle = new Bundle();
         bundle.putSerializable(Master.AVAILABLE_DEVICES_LIST_BUNDLE_KEY, availableWorkerDevices);
         intent.putExtras(bundle);
-        Log.d("TEST", "STARTM");
+        
         startActivity(intent);
         finish();
     }

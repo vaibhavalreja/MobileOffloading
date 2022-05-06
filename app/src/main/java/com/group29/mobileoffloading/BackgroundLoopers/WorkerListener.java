@@ -3,11 +3,11 @@ package com.group29.mobileoffloading.BackgroundLoopers;
 import android.content.Context;
 
 import com.google.android.gms.nearby.connection.Payload;
-import com.group29.mobileoffloading.DataModels.ClientPayLoad;
+import com.group29.mobileoffloading.DataModels.NodeDataPayload;
 import com.group29.mobileoffloading.DataModels.DeviceInfo;
-import com.group29.mobileoffloading.DataModels.WorkInfo;
+import com.group29.mobileoffloading.DataModels.WorkDataforWorker;
 import com.group29.mobileoffloading.Helpers.NearbySingleton;
-import com.group29.mobileoffloading.listeners.PayloadListener;
+import com.group29.mobileoffloading.listeners.NodeDataListener;
 import com.group29.mobileoffloading.listeners.WorkerStatusListener;
 import com.group29.mobileoffloading.utilities.DataPacketStringKeys;
 import com.group29.mobileoffloading.utilities.PayloadConverter;
@@ -19,7 +19,7 @@ public class WorkerListener {
     private final Context context;
     private final String nodeIdString;
     private final WorkerStatusListener workerStatusListener;
-    private PayloadListener payloadListener;
+    private NodeDataListener nodeDataListener;
 
     public WorkerListener(Context context, String nodeIdString, WorkerStatusListener workerStatusListener) {
         this.context = context;
@@ -28,16 +28,16 @@ public class WorkerListener {
     }
 
     public void start() {
-        payloadListener = new PayloadListener() {
+        nodeDataListener = new NodeDataListener() {
             @Override
-            public void onPayloadReceived(String nodeIdString, Payload payload) {
+            public void onDataReceived(String nodeIdString, Payload payload) {
                 try {
-                    ClientPayLoad tPayload = PayloadConverter.fromPayload(payload);
+                    NodeDataPayload tPayload = PayloadConverter.fromPayload(payload);
                     String payloadTag = tPayload.getTag();
 
                     if (payloadTag.equals(DataPacketStringKeys.WORK_STATUS)) {
                         if (workerStatusListener != null) {
-                            workerStatusListener.onWorkStatusReceived(nodeIdString, (WorkInfo) tPayload.getData());
+                            workerStatusListener.onWorkStatusReceived(nodeIdString, (WorkDataforWorker) tPayload.getData());
                         }
                     } else if (payloadTag.equals(DataPacketStringKeys.DEVICE_STATS)) {
                         if (workerStatusListener != null) {
@@ -50,12 +50,12 @@ public class WorkerListener {
             }
         };
 
-        NearbySingleton.getInstance(context).registerPayloadListener(payloadListener);
+        NearbySingleton.getInstance(context).registerPayloadListener(nodeDataListener);
         NearbySingleton.getInstance(context).acceptConnection(nodeIdString);
     }
 
     public void stop() {
-        NearbySingleton.getInstance(context).unregisterPayloadListener(payloadListener);
+        NearbySingleton.getInstance(context).unregisterPayloadListener(nodeDataListener);
     }
 
 }

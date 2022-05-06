@@ -2,7 +2,7 @@ package com.group29.mobileoffloading.DataModels;
 
 import java.io.Serializable;
 
-public class WorkInfo implements Serializable {
+public class WorkDataforWorker implements Serializable {
     private int partitionIndex;
     private String status;
     private int result;

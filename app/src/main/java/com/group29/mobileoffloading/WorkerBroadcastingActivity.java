@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.Settings;
-import android.util.Log;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AlertDialog;
@@ -26,7 +25,7 @@ import com.group29.mobileoffloading.listeners.ClientConnectionListener;
 public class WorkerBroadcastingActivity extends AppCompatActivity {
     public static final String MASTER_NODE_ID_BUNDLE_KEY = "MASTER_NODE_ID_BUNDLE_KEY";
     private String workerId;
-    private String masterId = "";
+    private String masterNodeId = "";
     private ClientConnectionListener connectionListener;
     private DeviceInfoBroadcaster deviceInfoBroadcaster;
     private Handler handler;
@@ -48,19 +47,19 @@ public class WorkerBroadcastingActivity extends AppCompatActivity {
         connectionListener = new ClientConnectionListener() {
             @Override
             public void onConnectionInitiated(String id, ConnectionInfo connectionInfo) {
-                Log.d("WORKER", "Connection Received: " + id + " Endpoint name: " + connectionInfo.getEndpointName());
-                masterId = id;
+                
+                masterNodeId = id;
                 showDialog(connectionInfo.getEndpointName());
             }
 
             @Override
             public void onConnectionResult(String id, ConnectionResolution connectionResolution) {
-                Log.d("WORKER", "Connection Accepted By: " + id + " " + connectionResolution.getStatus());
+                
             }
 
             @Override
             public void onDisconnected(String id) {
-                Log.d("WORKER", "Connection Disconnected: " + id);
+                
                 finish();
             }
         };
@@ -99,12 +98,12 @@ public class WorkerBroadcastingActivity extends AppCompatActivity {
         DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
             switch (which) {
                 case DialogInterface.BUTTON_POSITIVE:
-                    NearbySingleton.getInstance(getApplicationContext()).acceptConnection(masterId);
+                    NearbySingleton.getInstance(getApplicationContext()).acceptConnection(masterNodeId);
                     startWorkerComputation();
                     break;
 
                 case DialogInterface.BUTTON_NEGATIVE:
-                    NearbySingleton.getInstance(getApplicationContext()).rejectConnection(masterId);
+                    NearbySingleton.getInstance(getApplicationContext()).rejectConnection(masterNodeId);
                     break;
             }
         };
@@ -120,19 +119,19 @@ public class WorkerBroadcastingActivity extends AppCompatActivity {
         setState("Initializing...");
         super.onResume();
         NearbySingleton.getInstance(getApplicationContext()).advertise(workerId, advertisingOptions).addOnSuccessListener(command -> {
-            Log.d("WORKER", "Discoverable by all devices");
+            
             setState("Discoverable by all devices");
         }).addOnFailureListener(c -> {
             if (((ApiException) c).getStatusCode() == 8001) {
-                Log.d("WORKER", "Discoverable by all devices");
+                
                 setState("Discoverable by all devices");
             } else {
                 setState("Failed to host device");
             }
         });
         NearbySingleton.getInstance(getApplicationContext()).registerClientConnectionListener(connectionListener);
-        Log.d("WORKER", "Starting Device Stats");
-        deviceInfoBroadcaster.start();
+        
+        deviceInfoBroadcaster.begin();
         handler.postDelayed(runnable, 7000);
     }
 
@@ -140,29 +139,29 @@ public class WorkerBroadcastingActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         NearbySingleton.getInstance(getApplicationContext()).unregisterClientConnectionListener(connectionListener);
-        Log.d("WORKER", "Stopping Device Stats");
-        deviceInfoBroadcaster.stop();
+        
+        deviceInfoBroadcaster.destroy();
         handler.removeCallbacks(runnable);
     }
 
     private void startWorkerComputation() {
         Intent intent = new Intent(getApplicationContext(), WorkerActivity.class);
         Bundle bundle = new Bundle();
-        bundle.putString(MASTER_NODE_ID_BUNDLE_KEY, masterId);
+        bundle.putString(MASTER_NODE_ID_BUNDLE_KEY, masterNodeId);
         intent.putExtras(bundle);
         startActivity(intent);
         Nearby.getConnectionsClient(getApplicationContext()).stopAdvertising();
-        Log.d("WORKER", "Device is not discoverable");
+        
         finish();
     }
 
     @Override
     public void onBackPressed() {
         Nearby.getConnectionsClient(getApplicationContext()).stopAdvertising();
-        Log.d("WORKER", "Device is not discoverable");
-        if (!masterId.equals("")) {
-            NearbySingleton.getInstance(getApplicationContext()).disconnectFromEndpoint(masterId);
-            NearbySingleton.getInstance(getApplicationContext()).rejectConnection(masterId);
+        
+        if (!masterNodeId.equals("")) {
+            NearbySingleton.getInstance(getApplicationContext()).disconnectFromEndpoint(masterNodeId);
+            NearbySingleton.getInstance(getApplicationContext()).rejectConnection(masterNodeId);
         }
         finish();
         super.onBackPressed();

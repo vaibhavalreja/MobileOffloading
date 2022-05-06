@@ -6,7 +6,7 @@ public class Worker implements Serializable {
 
     private String nodeIdString, endpointName;
     private DeviceInfo deviceInfo;
-    private WorkInfo workInfo;
+    private WorkDataforWorker workDataforWorker;
 
     private int workQuantity;
     private float distanceFromMaster;
@@ -27,12 +27,12 @@ public class Worker implements Serializable {
         this.endpointName = endpointName;
     }
 
-    public WorkInfo getWorkStatus() {
-        return workInfo;
+    public WorkDataforWorker getWorkStatus() {
+        return workDataforWorker;
     }
 
-    public void setWorkStatus(WorkInfo workStatus) {
-        this.workInfo = workStatus;
+    public void setWorkStatus(WorkDataforWorker workStatus) {
+        this.workDataforWorker = workStatus;
     }
 
     public DeviceInfo getDeviceStats() {
